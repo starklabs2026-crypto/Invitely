@@ -1,5 +1,6 @@
-import { initializeApp, getApps } from 'firebase/app';
+import { initializeApp, getApps, getApp } from 'firebase/app';
 import {
+  initializeAuth,
   getAuth,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
@@ -8,6 +9,7 @@ import {
   updateProfile,
   type User as FirebaseUser,
 } from 'firebase/auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { User } from '@/types/auth';
 
 const firebaseConfig = {
@@ -19,11 +21,21 @@ const firebaseConfig = {
   appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID ?? '',
 };
 
-if (!getApps().length) {
-  initializeApp(firebaseConfig);
-}
+const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
-const auth = getAuth();
+// initializeAuth with AsyncStorage persistence is required for React Native.
+// The try/catch handles hot-reload where auth is already initialized.
+const auth = (() => {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { getReactNativePersistence } = require('firebase/auth');
+    return initializeAuth(app, {
+      persistence: getReactNativePersistence(AsyncStorage),
+    });
+  } catch {
+    return getAuth(app);
+  }
+})();
 
 function mapFirebaseUser(fbUser: FirebaseUser): User {
   return {
