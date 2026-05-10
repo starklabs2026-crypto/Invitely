@@ -3,19 +3,10 @@ import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
 import { FONTS } from '@/constants/fonts';
 
-type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
-
-const TAB_ICONS: Record<string, { active: IoniconName; inactive: IoniconName }> = {
-  home: { active: 'home', inactive: 'home-outline' },
-  categories: { active: 'grid', inactive: 'grid-outline' },
-  'my-designs': { active: 'heart', inactive: 'heart-outline' },
-  premium: { active: 'star', inactive: 'star-outline' },
-};
-
 export default function TabsLayout() {
   return (
     <Tabs
-      screenOptions={({ route }) => ({
+      screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: COLORS.tabBarActive,
         tabBarInactiveTintColor: COLORS.tabBarInactive,
@@ -23,27 +14,52 @@ export default function TabsLayout() {
           backgroundColor: COLORS.tabBarBg,
           borderTopColor: COLORS.border,
           borderTopWidth: 1,
-          height: 60,
+          height: 64,
           paddingBottom: 8,
-          paddingTop: 4,
+          paddingTop: 6,
         },
         tabBarLabelStyle: {
           fontFamily: FONTS.medium,
           fontSize: 11,
         },
-        tabBarIcon: ({ color, focused }) => {
-          const icons = TAB_ICONS[route.name];
-          const iconName: IoniconName = focused
-            ? (icons?.active ?? 'ellipse')
-            : (icons?.inactive ?? 'ellipse-outline');
-          return <Ionicons name={iconName} size={22} color={color} />;
-        },
-      })}
+      }}
     >
-      <Tabs.Screen name="home" options={{ title: 'Home' }} />
-      <Tabs.Screen name="categories" options={{ title: 'Categories' }} />
-      <Tabs.Screen name="my-designs" options={{ title: 'My Designs' }} />
-      <Tabs.Screen name="premium" options={{ title: 'Premium' }} />
+      <Tabs.Screen
+        name="home"
+        options={{
+          title: 'Home',
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons name={focused ? 'home' : 'home-outline'} size={23} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="categories"
+        options={{
+          title: 'Explore',
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons name={focused ? 'compass' : 'compass-outline'} size={23} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="my-designs"
+        options={{
+          title: 'My Designs',
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons name={focused ? 'images' : 'images-outline'} size={23} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="premium"
+        options={{
+          title: 'Premium',
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons name={focused ? 'diamond' : 'diamond-outline'} size={23} color={color} />
+          ),
+        }}
+      />
     </Tabs>
   );
 }
