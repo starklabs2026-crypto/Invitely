@@ -47,7 +47,7 @@ export default function TabsLayout() {
         options={{
           title: 'My Designs',
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? 'images' : 'images-outline'} size={23} color={color} />
+            <Ionicons name={focused ? 'albums' : 'albums-outline'} size={23} color={color} />
           ),
         }}
       />
@@ -56,7 +56,7 @@ export default function TabsLayout() {
         options={{
           title: 'Premium',
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? 'diamond' : 'diamond-outline'} size={23} color={color} />
+            <Ionicons name={focused ? 'star' : 'star-outline'} size={23} color={color} />
           ),
         }}
       />
