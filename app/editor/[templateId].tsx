@@ -83,9 +83,6 @@ export default function EditorScreen() {
               <EditorCanvas
                 ref={canvasRef}
                 bgImageUrl={template.bg_image_url}
-                zones={editor.zones}
-                selectedZoneId={editor.selectedZoneId}
-                onZoneTap={(id) => editor.selectZone(id)}
                 onCanvasTap={() => editor.selectZone(null)}
                 aspectRatio={template.aspect_ratio}
               />
@@ -98,6 +95,7 @@ export default function EditorScreen() {
                 isSelected={zone.id === editor.selectedZoneId}
                 onSelect={() => editor.selectZone(zone.id)}
                 onChangeText={(text) => editor.updateZone(zone.id, { text })}
+                onMove={(x, y) => editor.updateZone(zone.id, { x, y })}
                 canvasHeight={canvasHeight}
               />
             ))}
