@@ -1,9 +1,10 @@
 import React from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
 import { FONTS } from '@/constants/fonts';
 import type { Template } from '@/types/template';
+import { TemplateThumbnail } from './TemplateThumbnail';
 
 interface TemplateCardProps {
   template: Template;
@@ -20,12 +21,7 @@ export function TemplateCard({ template, onPress, onFavourite, isFavourited }: T
       activeOpacity={0.9}
     >
       <View style={styles.imageWrapper}>
-        <Image
-          source={{ uri: template.thumb_url }}
-          style={styles.image}
-          resizeMode="cover"
-          defaultSource={require('@/assets/placeholder.png')}
-        />
+        <TemplateThumbnail template={template} />
 
         {template.tier === 'premium' && (
           <View style={styles.crownBadge}>
@@ -69,10 +65,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     overflow: 'hidden',
     backgroundColor: COLORS.bg2,
-  },
-  image: {
-    width: '100%',
-    height: '100%',
   },
   crownBadge: {
     position: 'absolute',

@@ -9,6 +9,7 @@ export function useEditor() {
     store.setTemplate(template);
     const zones: ZoneState[] = template.text_zones.map((tz) => ({
       id: tz.id,
+      label: tz.label,
       text: tz.defaultText,
       fontFamily: tz.fontFamily,
       fontSize: tz.fontSize,

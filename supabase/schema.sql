@@ -9,7 +9,7 @@ create table if not exists templates (
   name            text not null,
   category        text not null check (category in (
     'birthday', 'kids_birthday', 'wedding',
-    'baby_shower', 'baby_announcement', 'anniversary'
+    'baby_shower', 'baby_announcement', 'anniversary', 'festival'
   )),
   subcategory     text[]   default '{}',
   style_tags      text[]   default '{}',

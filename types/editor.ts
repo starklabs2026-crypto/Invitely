@@ -1,5 +1,6 @@
 export interface ZoneState {
   id: string;
+  label: string;
   text: string;
   fontFamily: string;
   fontSize: number;

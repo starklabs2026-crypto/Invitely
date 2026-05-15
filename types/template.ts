@@ -4,7 +4,8 @@ export type TemplateCategory =
   | 'wedding'
   | 'baby_shower'
   | 'baby_announcement'
-  | 'anniversary';
+  | 'anniversary'
+  | 'festival';
 
 export type TemplateTier = 'free' | 'premium';
 

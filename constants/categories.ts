@@ -15,4 +15,5 @@ export const CATEGORIES: CategoryConfig[] = [
   { id: 'baby_shower', label: 'Baby Shower', icon: 'heart-outline', color: '#3D8A8A', count: 6 },
   { id: 'baby_announcement', label: 'Baby Announcement', icon: 'star-outline', color: '#C9A96E', count: 6 },
   { id: 'anniversary', label: 'Anniversary', icon: 'wine-outline', color: '#5A8A5A', count: 6 },
+  { id: 'festival', label: 'Festival', icon: 'sparkles-outline', color: '#E05C1A', count: 0 },
 ] as const;

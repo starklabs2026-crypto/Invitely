@@ -1,23 +1,19 @@
 import React, { useRef } from 'react';
-import { View, Text, TextInput, PanResponder, StyleSheet } from 'react-native';
+import { View, Text, PanResponder, StyleSheet } from 'react-native';
 import type { ZoneState } from '@/types/editor';
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from './EditorCanvas';
-import { COLORS } from '@/constants/colors';
 
 interface TextZoneProps {
   zone: ZoneState;
   isSelected: boolean;
   onSelect: () => void;
-  onChangeText: (text: string) => void;
   onMove: (x: number, y: number) => void;
   canvasHeight?: number;
 }
 
-export function TextZone({ zone, isSelected, onSelect, onChangeText, onMove, canvasHeight }: TextZoneProps) {
-  const inputRef = useRef<TextInput>(null);
+export function TextZone({ zone, isSelected, onSelect, onMove, canvasHeight }: TextZoneProps) {
   const resolvedHeight = canvasHeight ?? CANVAS_HEIGHT;
 
-  // Keep mutable refs in sync so PanResponder callbacks never go stale
   const isSelectedRef = useRef(isSelected);
   isSelectedRef.current = isSelected;
   const zoneRef = useRef(zone);
@@ -30,21 +26,24 @@ export function TextZone({ zone, isSelected, onSelect, onChangeText, onMove, can
   onMoveRef.current = onMove;
 
   const totalMovement = useRef(0);
+  const initialPos = useRef({ x: 0, y: 0 });
+  const DAMPING = 0.5;
 
   const panResponder = useRef(
     PanResponder.create({
-      onStartShouldSetPanResponder: () => !isSelectedRef.current,
+      onStartShouldSetPanResponder: () => true,
       onMoveShouldSetPanResponder: (_, g) =>
-        !isSelectedRef.current && (Math.abs(g.dx) > 3 || Math.abs(g.dy) > 3),
+        Math.abs(g.dx) > 3 || Math.abs(g.dy) > 3,
       onPanResponderGrant: () => {
         totalMovement.current = 0;
+        initialPos.current = { x: zoneRef.current.x, y: zoneRef.current.y };
       },
       onPanResponderMove: (_, g) => {
         totalMovement.current = Math.sqrt(g.dx ** 2 + g.dy ** 2);
         const z = zoneRef.current;
         const h = resolvedHeightRef.current;
-        const newX = z.x + (g.dx / CANVAS_WIDTH) * 100;
-        const newY = z.y + (g.dy / h) * 100;
+        const newX = initialPos.current.x + (g.dx / CANVAS_WIDTH) * 100 * DAMPING;
+        const newY = initialPos.current.y + (g.dy / h) * 100 * DAMPING;
         onMoveRef.current(
           Math.max(0, Math.min(100 - z.w, newX)),
           Math.max(0, Math.min(100 - z.h, newY))
@@ -77,22 +76,9 @@ export function TextZone({ zone, isSelected, onSelect, onChangeText, onMove, can
   return (
     <View
       style={[styles.container, { left, top, width }]}
-      {...(!isSelected ? panResponder.panHandlers : {})}
+      {...panResponder.panHandlers}
     >
-      {isSelected ? (
-        <TextInput
-          ref={inputRef}
-          style={[styles.field, textStyle]}
-          value={displayText}
-          onChangeText={onChangeText}
-          multiline
-          autoFocus
-          submitBehavior="newline"
-          selectionColor={COLORS.primary}
-        />
-      ) : (
-        <Text style={[styles.field, textStyle]}>{displayText}</Text>
-      )}
+      <Text style={[styles.field, textStyle]}>{displayText}</Text>
     </View>
   );
 }

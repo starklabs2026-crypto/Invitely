@@ -11,32 +11,66 @@ interface EditorToolbarProps {
   onUpdateZone: (updates: Partial<ZoneState>) => void;
   onDuplicate: () => void;
   onDelete: () => void;
+  onEdit: () => void;
 }
 
-const FONT_OPTIONS = ['DMSans_400Regular', 'PlayfairDisplay_400Regular', 'PlayfairDisplay_700Bold'];
-const FONT_LABELS: Record<string, string> = {
-  DMSans_400Regular: 'DM Sans',
-  PlayfairDisplay_400Regular: 'Playfair',
-  'PlayfairDisplay_700Bold': 'Playfair Bold',
-};
+const FONT_OPTIONS: { key: string; label: string }[] = [
+  { key: 'DMSans_400Regular',              label: 'DM Sans' },
+  { key: 'DMSans_700Bold',                 label: 'DM Sans Bold' },
+  { key: 'PlayfairDisplay_400Regular',     label: 'Playfair' },
+  { key: 'PlayfairDisplay_700Bold',        label: 'Playfair Bold' },
+  { key: 'CormorantGaramond_400Regular',   label: 'Cormorant' },
+  { key: 'CormorantGaramond_700Bold',      label: 'Cormorant Bold' },
+  { key: 'GreatVibes_400Regular',          label: 'Great Vibes' },
+  { key: 'DancingScript_400Regular',       label: 'Dancing Script' },
+  { key: 'DancingScript_700Bold',          label: 'Dancing Bold' },
+  { key: 'Cinzel_400Regular',              label: 'Cinzel' },
+  { key: 'Cinzel_700Bold',                 label: 'Cinzel Bold' },
+  { key: 'Lora_400Regular',               label: 'Lora' },
+  { key: 'Lora_700Bold',                  label: 'Lora Bold' },
+  { key: 'Montserrat_400Regular',          label: 'Montserrat' },
+  { key: 'Montserrat_700Bold',             label: 'Montserrat Bold' },
+  { key: 'Sacramento_400Regular',          label: 'Sacramento' },
+  { key: 'Raleway_400Regular',             label: 'Raleway' },
+  { key: 'Raleway_700Bold',               label: 'Raleway Bold' },
+  { key: 'JosefinSans_400Regular',         label: 'Josefin Sans' },
+  { key: 'JosefinSans_700Bold',            label: 'Josefin Bold' },
+];
+
 const COLOR_OPTIONS = [
   '#1A1614', '#FFFFFF', '#C96442', '#E8A87C', '#C9A96E',
   '#3D8A8A', '#8B7DB8', '#C96480', '#5A8A5A', '#E53935',
+  '#1A2744', '#C9A84C', '#4A7C3F', '#2D0030', '#000000',
 ];
-const SIZE_OPTIONS = [12, 14, 16, 18, 20, 24, 28, 32, 36, 42, 48];
 
-export function EditorToolbar({ selectedZone, onUpdateZone, onDuplicate, onDelete }: EditorToolbarProps) {
+const SIZE_OPTIONS = [10, 12, 14, 16, 18, 20, 24, 28, 32, 36, 42, 48, 56, 64, 72];
+
+const ALIGN_ICONS: Record<string, React.ComponentProps<typeof Ionicons>['name']> = {
+  left: 'reorder-four-outline',
+  center: 'reorder-three-outline',
+  right: 'menu-outline',
+};
+
+export function EditorToolbar({
+  selectedZone,
+  onUpdateZone,
+  onDuplicate,
+  onDelete,
+  onEdit,
+}: EditorToolbarProps) {
   const [fontSheetOpen, setFontSheetOpen] = useState(false);
   const [colorSheetOpen, setColorSheetOpen] = useState(false);
   const [sizeSheetOpen, setSizeSheetOpen] = useState(false);
 
   if (!selectedZone) return null;
 
+  const nextAlign = selectedZone.align === 'left' ? 'center' : selectedZone.align === 'center' ? 'right' : 'left';
+
   const row1Items = [
     {
       label: 'Edit',
       icon: 'create-outline' as const,
-      onPress: () => {},
+      onPress: onEdit,
     },
     {
       label: 'Font',
@@ -56,13 +90,15 @@ export function EditorToolbar({ selectedZone, onUpdateZone, onDuplicate, onDelet
     },
     {
       label: 'Bold',
-      icon: 'reorder-four-outline' as const,
+      customLabel: 'B',
+      icon: null as null,
       onPress: () => onUpdateZone({ bold: !selectedZone.bold }),
       active: selectedZone.bold,
     },
     {
       label: 'Italic',
-      icon: 'text-outline' as const,
+      customLabel: 'I',
+      icon: null as null,
       onPress: () => onUpdateZone({ italic: !selectedZone.italic }),
       active: selectedZone.italic,
     },
@@ -70,22 +106,16 @@ export function EditorToolbar({ selectedZone, onUpdateZone, onDuplicate, onDelet
 
   const row2Items = [
     {
-      label: 'Align',
-      icon: (selectedZone.align === 'left'
-        ? 'reorder-four-outline'
-        : selectedZone.align === 'right'
-        ? 'reorder-four-outline'
-        : 'reorder-three-outline') as React.ComponentProps<typeof Ionicons>['name'],
-      onPress: () => {
-        const next = selectedZone.align === 'left' ? 'center' : selectedZone.align === 'center' ? 'right' : 'left';
-        onUpdateZone({ align: next });
-      },
+      label: selectedZone.align === 'left' ? 'Left' : selectedZone.align === 'center' ? 'Center' : 'Right',
+      icon: ALIGN_ICONS[selectedZone.align] as React.ComponentProps<typeof Ionicons>['name'],
+      onPress: () => onUpdateZone({ align: nextAlign }),
     },
     {
       label: 'Spacing',
       icon: 'git-commit-outline' as const,
       onPress: () =>
         onUpdateZone({ letterSpacing: selectedZone.letterSpacing === 0 ? 2 : 0 }),
+      active: selectedZone.letterSpacing > 0,
     },
     {
       label: 'Line Ht',
@@ -98,11 +128,6 @@ export function EditorToolbar({ selectedZone, onUpdateZone, onDuplicate, onDelet
       icon: 'arrow-up-outline' as const,
       onPress: () => onUpdateZone({ caps: !selectedZone.caps }),
       active: selectedZone.caps,
-    },
-    {
-      label: 'Arc',
-      icon: 'ellipse-outline' as const,
-      onPress: () => {},
     },
     {
       label: 'Copy',
@@ -120,7 +145,12 @@ export function EditorToolbar({ selectedZone, onUpdateZone, onDuplicate, onDelet
   return (
     <>
       <View style={styles.toolbar}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.row} contentContainerStyle={styles.rowContent}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.row}
+          contentContainerStyle={styles.rowContent}
+        >
           {row1Items.map((item) => (
             <TouchableOpacity
               key={item.label}
@@ -130,9 +160,13 @@ export function EditorToolbar({ selectedZone, onUpdateZone, onDuplicate, onDelet
             >
               {item.colorDot ? (
                 <View style={[styles.colorDotPreview, { backgroundColor: item.colorDot }]} />
+              ) : item.customLabel ? (
+                <Text style={[styles.customIconLabel, item.active && styles.customIconLabelActive]}>
+                  {item.customLabel}
+                </Text>
               ) : (
                 <Ionicons
-                  name={item.icon}
+                  name={item.icon!}
                   size={18}
                   color={item.active ? COLORS.white : COLORS.ink}
                 />
@@ -146,7 +180,12 @@ export function EditorToolbar({ selectedZone, onUpdateZone, onDuplicate, onDelet
 
         <View style={styles.divider} />
 
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.row} contentContainerStyle={styles.rowContent}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.row}
+          contentContainerStyle={styles.rowContent}
+        >
           {row2Items.map((item) => (
             <TouchableOpacity
               key={item.label}
@@ -177,25 +216,27 @@ export function EditorToolbar({ selectedZone, onUpdateZone, onDuplicate, onDelet
         </ScrollView>
       </View>
 
-      <BottomSheet visible={fontSheetOpen} onClose={() => setFontSheetOpen(false)} height={220}>
+      {/* Font picker */}
+      <BottomSheet visible={fontSheetOpen} onClose={() => setFontSheetOpen(false)} height={380}>
         <Text style={styles.sheetTitle}>Choose Font</Text>
-        {FONT_OPTIONS.map((font) => (
-          <TouchableOpacity
-            key={font}
-            style={[styles.sheetRow, selectedZone.fontFamily === font && styles.sheetRowActive]}
-            onPress={() => { onUpdateZone({ fontFamily: font }); setFontSheetOpen(false); }}
-          >
-            <Text style={[styles.sheetRowText, { fontFamily: font }]}>
-              {FONT_LABELS[font] ?? font}
-            </Text>
-            {selectedZone.fontFamily === font && (
-              <Ionicons name="checkmark" size={18} color={COLORS.primary} />
-            )}
-          </TouchableOpacity>
-        ))}
+        <ScrollView showsVerticalScrollIndicator={false}>
+          {FONT_OPTIONS.map((f) => (
+            <TouchableOpacity
+              key={f.key}
+              style={[styles.sheetRow, selectedZone.fontFamily === f.key && styles.sheetRowActive]}
+              onPress={() => { onUpdateZone({ fontFamily: f.key }); setFontSheetOpen(false); }}
+            >
+              <Text style={[styles.sheetRowText, { fontFamily: f.key }]}>{f.label}</Text>
+              {selectedZone.fontFamily === f.key && (
+                <Ionicons name="checkmark" size={18} color={COLORS.primary} />
+              )}
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
       </BottomSheet>
 
-      <BottomSheet visible={colorSheetOpen} onClose={() => setColorSheetOpen(false)} height={200}>
+      {/* Color picker */}
+      <BottomSheet visible={colorSheetOpen} onClose={() => setColorSheetOpen(false)} height={220}>
         <Text style={styles.sheetTitle}>Choose Color</Text>
         <View style={styles.colorGrid}>
           {COLOR_OPTIONS.map((color) => (
@@ -212,9 +253,10 @@ export function EditorToolbar({ selectedZone, onUpdateZone, onDuplicate, onDelet
         </View>
       </BottomSheet>
 
-      <BottomSheet visible={sizeSheetOpen} onClose={() => setSizeSheetOpen(false)} height={220}>
+      {/* Size picker */}
+      <BottomSheet visible={sizeSheetOpen} onClose={() => setSizeSheetOpen(false)} height={280}>
         <Text style={styles.sheetTitle}>Choose Size</Text>
-        <ScrollView>
+        <ScrollView showsVerticalScrollIndicator={false}>
           {SIZE_OPTIONS.map((size) => (
             <TouchableOpacity
               key={size}
@@ -240,9 +282,7 @@ const styles = StyleSheet.create({
     borderTopColor: COLORS.border,
     paddingBottom: 8,
   },
-  row: {
-    flexShrink: 0,
-  },
+  row: { flexShrink: 0 },
   rowContent: {
     paddingHorizontal: 8,
     paddingVertical: 6,
@@ -273,12 +313,15 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: COLORS.ink,
   },
-  toolLabelActive: {
-    color: COLORS.white,
+  toolLabelActive: { color: COLORS.white },
+  toolLabelDestructive: { color: '#E53935' },
+  customIconLabel: {
+    fontFamily: FONTS.bold,
+    fontSize: 16,
+    color: COLORS.ink,
+    lineHeight: 20,
   },
-  toolLabelDestructive: {
-    color: '#E53935',
-  },
+  customIconLabelActive: { color: COLORS.white },
   colorDotPreview: {
     width: 18,
     height: 18,
