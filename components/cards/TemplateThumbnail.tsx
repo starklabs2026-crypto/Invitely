@@ -24,7 +24,7 @@ export function TemplateThumbnail({ template }: Props) {
       <Image
         source={{ uri: template.bg_image_url }}
         style={StyleSheet.absoluteFill}
-        resizeMode="cover"
+        resizeMode="stretch"
       />
 
       {scale > 0 &&
@@ -32,6 +32,7 @@ export function TemplateThumbnail({ template }: Props) {
           const left = (zone.x / 100) * size.width;
           const top = (zone.y / 100) * size.height;
           const width = (zone.w / 100) * size.width;
+          const height = Math.max(4, (zone.h / 100) * size.height);
           const fontSize = Math.max(4, Math.round(zone.fontSize * scale));
 
           return (
@@ -43,6 +44,7 @@ export function TemplateThumbnail({ template }: Props) {
                 left,
                 top,
                 width,
+                height,
                 fontSize,
                 fontFamily: zone.fontFamily,
                 color: zone.color,

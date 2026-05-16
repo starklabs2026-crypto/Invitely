@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
-  Image,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
@@ -18,16 +17,22 @@ import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { useTemplate } from '@/hooks/useTemplates';
 import { useTemplateStore } from '@/store/templateStore';
+import { TemplateThumbnail } from '@/components/cards/TemplateThumbnail';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const PREVIEW_WIDTH = SCREEN_WIDTH - 48;
-const PREVIEW_HEIGHT = PREVIEW_WIDTH * (7 / 5);
 
 export default function TemplateDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data: template, isLoading, isError, refetch } = useTemplate(id!);
   const { favourites, toggleFavourite } = useTemplateStore();
   const isFavourited = favourites.includes(id!);
+
+  const previewHeight = (() => {
+    if (!template?.aspect_ratio) return PREVIEW_WIDTH * (7 / 5);
+    const [w, h] = template.aspect_ratio.split(':').map(Number);
+    return PREVIEW_WIDTH * (h / w);
+  })();
 
   if (isLoading) {
     return (
@@ -71,13 +76,8 @@ export default function TemplateDetailScreen() {
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
-        <View style={styles.previewContainer}>
-          <Image
-            source={{ uri: template.bg_image_url }}
-            style={styles.preview}
-            resizeMode="cover"
-            defaultSource={require('@/assets/placeholder.png')}
-          />
+        <View style={[styles.previewContainer, { height: previewHeight }]}>
+          <TemplateThumbnail template={template} />
           {template.tier === 'premium' && (
             <View style={styles.tierBadge}>
               <Badge type="premium" />
@@ -150,7 +150,6 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginTop: 24,
     width: PREVIEW_WIDTH,
-    height: PREVIEW_HEIGHT,
     borderRadius: 16,
     overflow: 'hidden',
     shadowColor: '#000',
@@ -158,10 +157,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.12,
     shadowRadius: 16,
     elevation: 8,
-  },
-  preview: {
-    width: '100%',
-    height: '100%',
   },
   tierBadge: {
     position: 'absolute',

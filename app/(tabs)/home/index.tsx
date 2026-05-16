@@ -6,7 +6,6 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
-  ActivityIndicator,
   Dimensions,
 } from 'react-native';
 import { router } from 'expo-router';
@@ -95,7 +94,7 @@ export default function HomeScreen() {
           activeOpacity={0.9}
         >
           <LinearGradient
-            colors={[COLORS.primary, '#8B3A20']}
+            colors={[COLORS.primary, '#5B21B6']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.banner}

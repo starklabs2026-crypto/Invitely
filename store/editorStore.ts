@@ -4,12 +4,16 @@ import type { Template } from '@/types/template';
 
 interface EditorStore extends EditorState {
   template: Template | null;
+  capturedUri: string | null;
+  cardId: string | null;
   setTemplate: (template: Template) => void;
   initZones: (zones: ZoneState[]) => void;
   selectZone: (id: string | null) => void;
   updateZone: (id: string, updates: Partial<ZoneState>) => void;
   duplicateZone: (id: string) => void;
   deleteZone: (id: string) => void;
+  setCapturedUri: (uri: string | null) => void;
+  setCardId: (id: string) => void;
   undo: () => void;
   redo: () => void;
   reset: () => void;
@@ -26,8 +30,12 @@ const INITIAL_STATE: EditorState = {
 export const useEditorStore = create<EditorStore>((set, get) => ({
   ...INITIAL_STATE,
   template: null,
+  capturedUri: null,
+  cardId: null,
 
   setTemplate: (template) => set({ template, templateId: template.id }),
+  setCapturedUri: (uri) => set({ capturedUri: uri }),
+  setCardId: (id) => set({ cardId: id }),
 
   initZones: (zones) => set({ zones, undoStack: [], redoStack: [] }),
 
@@ -53,8 +61,8 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     const newZone: ZoneState = {
       ...zone,
       id: `${id}_copy_${Date.now()}`,
-      x: zone.x + 2,
-      y: zone.y + 2,
+      x: Math.max(0, Math.min(100 - zone.w, zone.x + 2)),
+      y: Math.max(0, Math.min(100 - zone.h, zone.y + 2)),
       isSelected: false,
     };
     set({
@@ -96,5 +104,5 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     });
   },
 
-  reset: () => set({ ...INITIAL_STATE, template: null }),
+  reset: () => set({ ...INITIAL_STATE, template: null, capturedUri: null, cardId: null }),
 }));

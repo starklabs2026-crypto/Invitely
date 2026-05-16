@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -10,72 +10,72 @@ import {
   ActivityIndicator,
   Dimensions,
 } from 'react-native';
-import { useLocalSearchParams, router } from 'expo-router';
+import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import * as Sharing from 'expo-sharing';
+import * as MediaLibrary from 'expo-media-library';
 import { COLORS } from '@/constants/colors';
 import { FONTS } from '@/constants/fonts';
 import { Button } from '@/components/ui/Button';
 import { useEditorStore } from '@/store/editorStore';
-import { writeTempFile, saveImageToGallery } from '@/services/storage';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 export default function ShareScreen() {
-  const { cardId } = useLocalSearchParams<{ cardId: string }>();
+  const capturedUri = useEditorStore((s) => s.capturedUri);
   const template = useEditorStore((s) => s.template);
   const [sharing, setSharing] = useState(false);
-  const [downloading, setDownloading] = useState(false);
+  const [saving, setSaving] = useState(false);
 
-  const previewUri = template?.thumb_url ?? null;
-
-  async function handleShare(platform: string) {
-    if (!previewUri) {
+  async function handleShare() {
+    if (!capturedUri) {
       Alert.alert('No card', 'Please complete your design first.');
       return;
     }
-
     setSharing(true);
     try {
       const isAvailable = await Sharing.isAvailableAsync();
       if (!isAvailable) {
-        Alert.alert('Sharing not available', 'Sharing is not available on this device.');
+        Alert.alert('Not available', 'Sharing is not available on this device.');
         return;
       }
-
-      const fileUri = await writeTempFile(
-        previewUri.startsWith('http') ? '' : previewUri,
-        `invitely_card_${Date.now()}`
-      );
-      await Sharing.shareAsync(fileUri, {
+      await Sharing.shareAsync(capturedUri, {
         mimeType: 'image/png',
         dialogTitle: 'Share your invitation',
       });
-    } catch (err) {
+    } catch {
       Alert.alert('Share failed', 'Could not share the card. Please try again.');
     } finally {
       setSharing(false);
     }
   }
 
-  async function handleDownload() {
-    setDownloading(true);
+  async function handleSave() {
+    if (!capturedUri) {
+      Alert.alert('No card', 'Please complete your design first.');
+      return;
+    }
+    setSaving(true);
     try {
-      Alert.alert('Downloaded!', 'Your invitation has been saved to your photo library.');
+      const { status } = await MediaLibrary.requestPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission denied', 'Please allow access to your photo library in Settings.');
+        return;
+      }
+      await MediaLibrary.saveToLibraryAsync(capturedUri);
+      Alert.alert('Saved!', 'Your invitation has been saved to your photo library.');
     } catch {
-      Alert.alert('Error', 'Could not save to gallery. Please check permissions.');
+      Alert.alert('Error', 'Could not save to gallery. Please try again.');
     } finally {
-      setDownloading(false);
+      setSaving(false);
     }
   }
 
-  const SHARE_OPTIONS = [
-    { label: 'WhatsApp', icon: 'logo-whatsapp' as const, color: '#25D366' },
-    { label: 'Instagram', icon: 'logo-instagram' as const, color: '#E1306C' },
-    { label: 'Download', icon: 'download-outline' as const, color: COLORS.ink },
-    { label: 'More', icon: 'share-social-outline' as const, color: COLORS.primary },
-  ];
+  const aspectRatio = template?.aspect_ratio ?? '7:5';
+  const [w, h] = aspectRatio.split(':').map(Number);
+  const previewWidth = SCREEN_WIDTH - 80;
+  const previewHeight = previewWidth * (h / w);
 
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
@@ -89,50 +89,57 @@ export default function ShareScreen() {
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
         <View style={styles.previewWrapper}>
-          {previewUri ? (
+          {capturedUri ? (
             <Image
-              source={{ uri: previewUri }}
-              style={styles.preview}
+              source={{ uri: capturedUri }}
+              style={[styles.preview, { width: previewWidth, height: previewHeight }]}
               resizeMode="contain"
-              defaultSource={require('@/assets/placeholder.png')}
             />
           ) : (
-            <View style={[styles.preview, styles.previewPlaceholder]}>
-              <Text style={styles.placeholderText}>Your invitation preview</Text>
+            <View style={[styles.preview, styles.previewPlaceholder, { width: previewWidth, height: previewHeight }]}>
+              <Text style={styles.placeholderText}>Preview not available</Text>
             </View>
           )}
         </View>
 
         <Text style={styles.sectionTitle}>Share via</Text>
         <View style={styles.shareRow}>
-          {SHARE_OPTIONS.map((opt) => (
-            <TouchableOpacity
-              key={opt.label}
-              style={styles.shareButton}
-              onPress={() =>
-                opt.label === 'Download' ? handleDownload() : handleShare(opt.label)
-              }
-              disabled={sharing || downloading}
-            >
-              <View style={[styles.shareIconWrap, { backgroundColor: opt.color + '20' }]}>
-                {(sharing || downloading) && opt.label === (sharing ? 'WhatsApp' : 'Download') ? (
-                  <ActivityIndicator color={opt.color} size="small" />
-                ) : (
-                  <Ionicons name={opt.icon} size={22} color={opt.color} />
-                )}
-              </View>
-              <Text style={styles.shareLabel}>{opt.label}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+          <TouchableOpacity style={styles.shareButton} onPress={handleSave} disabled={saving}>
+            <View style={[styles.shareIconWrap, { backgroundColor: COLORS.primary + '20' }]}>
+              {saving ? (
+                <ActivityIndicator color={COLORS.primary} size="small" />
+              ) : (
+                <Ionicons name="download-outline" size={22} color={COLORS.primary} />
+              )}
+            </View>
+            <Text style={styles.shareLabel}>Save</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.copyLink}
-          onPress={() => Alert.alert('Coming soon', 'Link sharing will be available soon.')}
-        >
-          <Ionicons name="link-outline" size={16} color={COLORS.primary} />
-          <Text style={styles.copyLinkText}>Copy link</Text>
-        </TouchableOpacity>
+          <TouchableOpacity style={styles.shareButton} onPress={handleShare} disabled={sharing}>
+            <View style={[styles.shareIconWrap, { backgroundColor: '#25D36620' }]}>
+              {sharing ? (
+                <ActivityIndicator color="#25D366" size="small" />
+              ) : (
+                <Ionicons name="logo-whatsapp" size={22} color="#25D366" />
+              )}
+            </View>
+            <Text style={styles.shareLabel}>WhatsApp</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.shareButton} onPress={handleShare} disabled={sharing}>
+            <View style={[styles.shareIconWrap, { backgroundColor: '#E1306C20' }]}>
+              <Ionicons name="logo-instagram" size={22} color="#E1306C" />
+            </View>
+            <Text style={styles.shareLabel}>Instagram</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.shareButton} onPress={handleShare} disabled={sharing}>
+            <View style={[styles.shareIconWrap, { backgroundColor: COLORS.ink + '15' }]}>
+              <Ionicons name="share-social-outline" size={22} color={COLORS.ink} />
+            </View>
+            <Text style={styles.shareLabel}>More</Text>
+          </TouchableOpacity>
+        </View>
 
         <View style={styles.rsvpSection}>
           <Text style={styles.rsvpTitle}>Collect RSVPs</Text>
@@ -176,8 +183,6 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.bg2,
   },
   preview: {
-    width: SCREEN_WIDTH - 80,
-    height: (SCREEN_WIDTH - 80) * (7 / 5),
     borderRadius: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 8 },
@@ -225,19 +230,6 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.medium,
     fontSize: 11,
     color: COLORS.ink,
-  },
-  copyLink: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    justifyContent: 'center',
-    marginTop: 20,
-    paddingVertical: 12,
-  },
-  copyLinkText: {
-    fontFamily: FONTS.medium,
-    fontSize: 14,
-    color: COLORS.primary,
   },
   rsvpSection: {
     marginHorizontal: 24,

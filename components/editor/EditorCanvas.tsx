@@ -46,7 +46,7 @@ export const EditorCanvas = forwardRef<View, EditorCanvasProps>(
               y={0}
               width={CANVAS_WIDTH}
               height={canvasHeight}
-              fit="cover"
+              fit="fill"
             />
           ) : (
             <Fill color={COLORS.bg2} />

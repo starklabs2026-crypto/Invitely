@@ -14,13 +14,19 @@ interface TemplateCardProps {
 }
 
 export function TemplateCard({ template, onPress, onFavourite, isFavourited }: TemplateCardProps) {
+  const imageAspectRatio = (() => {
+    if (!template.aspect_ratio) return 5 / 7;
+    const [w, h] = template.aspect_ratio.split(':').map(Number);
+    return w / h;
+  })();
+
   return (
     <TouchableOpacity
       style={styles.container}
       onPress={() => onPress(template.id)}
       activeOpacity={0.9}
     >
-      <View style={styles.imageWrapper}>
+      <View style={[styles.imageWrapper, { aspectRatio: imageAspectRatio }]}>
         <TemplateThumbnail template={template} />
 
         {template.tier === 'premium' && (
@@ -61,7 +67,6 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   imageWrapper: {
-    aspectRatio: 5 / 7,
     borderRadius: 12,
     overflow: 'hidden',
     backgroundColor: COLORS.bg2,

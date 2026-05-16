@@ -47,9 +47,17 @@ export default function SignupScreen() {
 
     setLoading(true);
     try {
-      const user = await signUp(email.trim().toLowerCase(), password, name.trim());
-      setUser(user);
-      router.replace('/(tabs)/home');
+      const result = await signUp(email.trim().toLowerCase(), password, name.trim());
+      if (result.status === 'confirm_email') {
+        Alert.alert(
+          'Check your email',
+          `We sent a confirmation link to ${email.trim().toLowerCase()}.\n\nClick the link in the email, then come back and log in.`,
+          [{ text: 'Go to login', onPress: () => router.replace('/(auth)/login') }]
+        );
+      } else {
+        setUser(result.user);
+        router.replace('/(tabs)/home');
+      }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Something went wrong.';
       Alert.alert('Sign up failed', message);

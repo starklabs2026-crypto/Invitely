@@ -11,10 +11,13 @@ interface AppHeaderProps {
   showBack?: boolean;
   showUndo?: boolean;
   showRedo?: boolean;
+  showSave?: boolean;
   canUndo?: boolean;
   canRedo?: boolean;
+  isSaving?: boolean;
   onUndo?: () => void;
   onRedo?: () => void;
+  onSave?: () => void;
   rightAction?: { label: string; onPress: () => void; variant?: 'primary' | 'default' };
 }
 
@@ -23,10 +26,13 @@ export function AppHeader({
   showBack = false,
   showUndo = false,
   showRedo = false,
+  showSave = false,
   canUndo = false,
   canRedo = false,
+  isSaving = false,
   onUndo,
   onRedo,
+  onSave,
   rightAction,
 }: AppHeaderProps) {
   const insets = useSafeAreaInsets();
@@ -55,6 +61,19 @@ export function AppHeader({
             disabled={!canRedo}
           >
             <Ionicons name="arrow-redo" size={20} color={canRedo ? COLORS.ink : COLORS.muted} />
+          </TouchableOpacity>
+        )}
+        {showSave && (
+          <TouchableOpacity
+            onPress={onSave}
+            style={[styles.iconButton, isSaving && styles.disabled]}
+            disabled={isSaving}
+          >
+            <Ionicons
+              name={isSaving ? 'cloud-upload-outline' : 'bookmark-outline'}
+              size={20}
+              color={isSaving ? COLORS.muted : COLORS.ink}
+            />
           </TouchableOpacity>
         )}
       </View>

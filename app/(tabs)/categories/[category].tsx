@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -13,31 +13,18 @@ import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
 import { FONTS } from '@/constants/fonts';
 import { CATEGORIES } from '@/constants/categories';
-import { CategoryChip } from '@/components/ui/CategoryChip';
 import { TemplateCard } from '@/components/cards/TemplateCard';
 import { useTemplates } from '@/hooks/useTemplates';
 import { useTemplateStore } from '@/store/templateStore';
 import type { TemplateCategory } from '@/types/template';
 
-const SUB_FILTERS = ['All', 'Babies', 'Kids', "Men's", "Women's", 'Elegant', 'Floral', 'Minimal'];
-
 export default function CategoryTemplatesScreen() {
   const { category } = useLocalSearchParams<{ category: string }>();
-  const [activeFilter, setActiveFilter] = useState('All');
   const categoryId = category as TemplateCategory;
 
   const categoryConfig = CATEGORIES.find((c) => c.id === categoryId);
   const { data: templates = [], isLoading, isError, refetch } = useTemplates(categoryId);
   const { favourites, toggleFavourite } = useTemplateStore();
-
-  const filtered = useMemo(() => {
-    if (activeFilter === 'All') return templates;
-    return templates.filter(
-      (t) =>
-        t.subcategory.some((s) => s.toLowerCase().includes(activeFilter.toLowerCase())) ||
-        t.style_tags.some((tag) => tag.toLowerCase().includes(activeFilter.toLowerCase()))
-    );
-  }, [templates, activeFilter]);
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -48,33 +35,17 @@ export default function CategoryTemplatesScreen() {
         <View style={styles.headerText}>
           <Text style={styles.title}>{categoryConfig?.label ?? category}</Text>
           {!isLoading && (
-            <Text style={styles.count}>{filtered.length} templates</Text>
+            <Text style={styles.count}>{templates.length} templates</Text>
           )}
         </View>
       </View>
 
       <FlatList
-        data={filtered}
+        data={templates}
         keyExtractor={(item) => item.id}
         numColumns={2}
         columnWrapperStyle={styles.gridRow}
         contentContainerStyle={styles.grid}
-        ListHeaderComponent={
-          <FlatList
-            data={SUB_FILTERS}
-            keyExtractor={(item) => item}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.filters}
-            renderItem={({ item }) => (
-              <CategoryChip
-                label={item}
-                selected={activeFilter === item}
-                onPress={() => setActiveFilter(item)}
-              />
-            )}
-          />
-        }
         renderItem={({ item }) => (
           <TemplateCard
             template={item}
@@ -130,11 +101,6 @@ const styles = StyleSheet.create({
     color: COLORS.muted,
     marginTop: 1,
   },
-  filters: {
-    paddingHorizontal: 4,
-    paddingVertical: 12,
-    gap: 8,
-  },
   grid: {
     paddingHorizontal: 12,
     paddingBottom: 24,
@@ -142,6 +108,7 @@ const styles = StyleSheet.create({
   gridRow: {
     gap: 12,
     paddingHorizontal: 4,
+    alignItems: 'flex-start',
   },
   center: {
     paddingTop: 80,

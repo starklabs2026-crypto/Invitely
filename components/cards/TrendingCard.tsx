@@ -1,9 +1,10 @@
 import React from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
 import { FONTS } from '@/constants/fonts';
 import type { Template } from '@/types/template';
+import { TemplateThumbnail } from './TemplateThumbnail';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CARD_WIDTH = SCREEN_WIDTH * 0.58;
@@ -14,14 +15,15 @@ interface TrendingCardProps {
 }
 
 export function TrendingCard({ template, onPress }: TrendingCardProps) {
+  const cardHeight = (() => {
+    if (!template.aspect_ratio) return CARD_WIDTH * 1.4;
+    const [w, h] = template.aspect_ratio.split(':').map(Number);
+    return CARD_WIDTH * (h / w);
+  })();
+
   return (
-    <TouchableOpacity style={styles.container} onPress={onPress} activeOpacity={0.9}>
-      <Image
-        source={{ uri: template.thumb_url }}
-        style={styles.image}
-        resizeMode="cover"
-        defaultSource={require('@/assets/placeholder.png')}
-      />
+    <TouchableOpacity style={[styles.container, { height: cardHeight }]} onPress={onPress} activeOpacity={0.9}>
+      <TemplateThumbnail template={template} />
       <View style={styles.overlay}>
         <View style={styles.info}>
           <Text style={styles.name} numberOfLines={2}>
@@ -42,14 +44,9 @@ export function TrendingCard({ template, onPress }: TrendingCardProps) {
 const styles = StyleSheet.create({
   container: {
     width: CARD_WIDTH,
-    height: CARD_WIDTH * 1.3,
     borderRadius: 16,
     overflow: 'hidden',
     backgroundColor: COLORS.bg2,
-  },
-  image: {
-    width: '100%',
-    height: '100%',
   },
   overlay: {
     position: 'absolute',

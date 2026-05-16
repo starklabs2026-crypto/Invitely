@@ -15,6 +15,7 @@ import { TextZone } from '@/components/editor/TextZone';
 import { TextEditModal } from '@/components/editor/TextEditModal';
 import { EditorToolbar } from '@/components/editor/EditorToolbar';
 import { useEditor } from '@/hooks/useEditor';
+import { useEditorFonts } from '@/hooks/useEditorFonts';
 import { useTemplate } from '@/hooks/useTemplates';
 import { useAuth } from '@/hooks/useAuth';
 import { saveDraft } from '@/services/templates';
@@ -25,6 +26,7 @@ export default function EditorScreen() {
   const { templateId } = useLocalSearchParams<{ templateId: string }>();
   const { data: template } = useTemplate(templateId!);
   const editor = useEditor();
+  useEditorFonts();
   const { user } = useAuth();
   const setCapturedUri = useEditorStore((s) => s.setCapturedUri);
   const cardId = useEditorStore((s) => s.cardId);
