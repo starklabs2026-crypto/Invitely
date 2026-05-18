@@ -12,9 +12,9 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 export const CANVAS_WIDTH = SCREEN_WIDTH;
 
 export function getCanvasHeight(aspectRatio?: string): number {
-  if (!aspectRatio) return SCREEN_WIDTH * (7 / 5);
+  if (!aspectRatio) return SCREEN_WIDTH * (16 / 9);
   const parts = aspectRatio.split(':').map(Number);
-  if (parts.length !== 2 || !parts[0] || !parts[1]) return SCREEN_WIDTH * (7 / 5);
+  if (parts.length !== 2 || !parts[0] || !parts[1]) return SCREEN_WIDTH * (16 / 9);
   return SCREEN_WIDTH * (parts[1] / parts[0]);
 }
 
@@ -46,7 +46,7 @@ export const EditorCanvas = forwardRef<View, EditorCanvasProps>(
               y={0}
               width={CANVAS_WIDTH}
               height={canvasHeight}
-              fit="fill"
+              fit="cover"
             />
           ) : (
             <Fill color={COLORS.bg2} />

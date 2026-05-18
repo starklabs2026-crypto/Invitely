@@ -24,7 +24,7 @@ export function TemplateThumbnail({ template }: Props) {
       <Image
         source={{ uri: template.bg_image_url }}
         style={StyleSheet.absoluteFill}
-        resizeMode="stretch"
+        resizeMode="cover"
       />
 
       {scale > 0 &&

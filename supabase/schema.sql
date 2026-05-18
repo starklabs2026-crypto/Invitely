@@ -91,7 +91,7 @@ insert into templates (
 (
   'bday-30th-sarah', '30th Birthday — Navy Gold', 'birthday',
   array['adults','milestone'], array['geometric','elegant','dark','gold'],
-  'free', 'landscape', '7:5',
+  'free', 'portrait', '9:16',
   'https://iybxwbebjgkdixdtnxal.supabase.co/storage/v1/object/public/templates/bday-30th-sarah.png',
   'https://iybxwbebjgkdixdtnxal.supabase.co/storage/v1/object/public/templates/bday-30th-sarah.png',
   array['#0D1B3E','#C9A96E','#FFFFFF','#1A1614'],
@@ -111,10 +111,10 @@ insert into templates (
 (
   'bday-40th-robert', '40th Birthday — Art & Wine', 'birthday',
   array['adults','milestone'], array['parchment','artsy','warm','wine'],
-  'free', 'landscape', '7:5',
+  'free', 'portrait', '9:16',
   'https://iybxwbebjgkdixdtnxal.supabase.co/storage/v1/object/public/templates/bday-40th-robert.png',
   'https://iybxwbebjgkdixdtnxal.supabase.co/storage/v1/object/public/templates/bday-40th-robert.png',
-  array['#F5F0E8','#6B4423','#C9A96E','#3D8A8A'],
+  array['#B8C4CC','#6B1E1E','#C9A96E','#2C2C2C'],
   '[
     {"id":"header","label":"Header","defaultText":"AN EVENING OF ART & WINE","x":42,"y":10,"w":54,"h":10,"fontFamily":"Cinzel_700Bold","fontSize":16,"color":"#4A2C17","align":"center","bold":false,"italic":false},
     {"id":"subtitle","label":"Subtitle","defaultText":"CELEBRATING THE 40TH BIRTHDAY OF","x":42,"y":24,"w":54,"h":7,"fontFamily":"CormorantSC_400Regular","fontSize":11,"color":"#4A2C17","align":"center","bold":false,"italic":false},
@@ -131,10 +131,10 @@ insert into templates (
 (
   'kbday-blastoff-leo', 'Blast Off! Space Party', 'kids_birthday',
   array['kids','space','boys'], array['space','rocket','colorful','playful'],
-  'free', 'landscape', '7:5',
+  'free', 'portrait', '9:16',
   'https://iybxwbebjgkdixdtnxal.supabase.co/storage/v1/object/public/templates/kbday-blastoff-leo.png',
   'https://iybxwbebjgkdixdtnxal.supabase.co/storage/v1/object/public/templates/kbday-blastoff-leo.png',
-  array['#1A237E','#00BCD4','#FFD54F','#FFFFFF'],
+  array['#F5F0E8','#1565C0','#E65100','#FAF8F5'],
   '[
     {"id":"title","label":"Title","defaultText":"BLAST OFF!","x":42,"y":8,"w":55,"h":14,"fontFamily":"Cinzel_700Bold","fontSize":32,"color":"#1A237E","align":"center","bold":false,"italic":false},
     {"id":"name","label":"Astronaut Name","defaultText":"JOIN ASTRONAUT LEO!","x":42,"y":27,"w":55,"h":9,"fontFamily":"Oswald_400Regular","fontSize":15,"color":"#1A237E","align":"center","bold":false,"italic":false},
@@ -152,7 +152,7 @@ insert into templates (
 (
   'kbday-woodland-maya', 'Woodland Tea Party', 'kids_birthday',
   array['kids','girls','nature'], array['woodland','floral','whimsical','pastel'],
-  'free', 'portrait', '5:7',
+  'free', 'portrait', '9:16',
   'https://iybxwbebjgkdixdtnxal.supabase.co/storage/v1/object/public/templates/kbday-woodland-maya.png',
   'https://iybxwbebjgkdixdtnxal.supabase.co/storage/v1/object/public/templates/kbday-woodland-maya.png',
   array['#5A8A5A','#6B4423','#FAF8F5','#E8A87C'],
@@ -173,7 +173,7 @@ insert into templates (
 (
   'bshower-littlestar', 'A Little Star Baby Shower', 'baby_shower',
   array['gender-neutral','celestial'], array['pastel','celestial','soft','watercolor'],
-  'free', 'landscape', '7:5',
+  'free', 'portrait', '9:16',
   'https://iybxwbebjgkdixdtnxal.supabase.co/storage/v1/object/public/templates/bshower-littlestar.png',
   'https://iybxwbebjgkdixdtnxal.supabase.co/storage/v1/object/public/templates/bshower-littlestar.png',
   array['#C5CAE9','#F8BBD0','#FFD54F','#FAF8F5'],
@@ -193,7 +193,7 @@ insert into templates (
 (
   'anniv-25th-emily-liam', '25th Anniversary — Rose Garden', 'anniversary',
   array['25th','silver','floral'], array['roses','romantic','elegant','cream'],
-  'premium', 'landscape', '7:5',
+  'premium', 'portrait', '9:16',
   'https://iybxwbebjgkdixdtnxal.supabase.co/storage/v1/object/public/templates/anniv-25th-emily-liam.png',
   'https://iybxwbebjgkdixdtnxal.supabase.co/storage/v1/object/public/templates/anniv-25th-emily-liam.png',
   array['#FFFFFF','#FAF8F5','#C62828','#2E7D32'],
@@ -214,7 +214,7 @@ insert into templates (
 (
   'anniv-hearts-sarah-david', 'Anniversary — Burgundy Hearts', 'anniversary',
   array['25th','classic','dark'], array['geometric','hearts','gold','dark','dramatic'],
-  'free', 'landscape', '7:5',
+  'free', 'portrait', '9:16',
   'https://iybxwbebjgkdixdtnxal.supabase.co/storage/v1/object/public/templates/anniv-hearts-sarah-david.png',
   'https://iybxwbebjgkdixdtnxal.supabase.co/storage/v1/object/public/templates/anniv-hearts-sarah-david.png',
   array['#4A0E0E','#C9A96E','#FAF8F5','#1A1614'],
@@ -233,7 +233,7 @@ insert into templates (
 (
   'anniv-25th-champagne-gold', '25th Anniversary — Champagne Gold', 'anniversary',
   array['25th','silver','classic'], array['champagne','gold','elegant','watercolor','cream'],
-  'free', 'portrait', '5:7',
+  'free', 'portrait', '9:16',
   'https://iybxwbebjgkdixdtnxal.supabase.co/storage/v1/object/public/templates/anniv-25th-champagne-gold.png',
   'https://iybxwbebjgkdixdtnxal.supabase.co/storage/v1/object/public/templates/anniv-25th-champagne-gold.png',
   array['#F5ECD7','#C9A84C','#2C2C2C','#8B7355'],
@@ -255,7 +255,7 @@ insert into templates (
 (
   'anniv-25th-navy-lights', '25th Anniversary — Navy Lights', 'anniversary',
   array['25th','silver','night'], array['navy','gold','string-lights','botanical','elegant','dark'],
-  'free', 'portrait', '5:7',
+  'free', 'portrait', '9:16',
   'https://iybxwbebjgkdixdtnxal.supabase.co/storage/v1/object/public/templates/anniv-25th-navy-lights.png',
   'https://iybxwbebjgkdixdtnxal.supabase.co/storage/v1/object/public/templates/anniv-25th-navy-lights.png',
   array['#1A2744','#C9A84C','#FFFFFF','#2A3D5A'],
@@ -298,7 +298,7 @@ insert into templates (
 (
   'holi-party-colors', 'Holi Party — Color Splash', 'festival',
   array['holi','indian','colorful'], array['holi','vibrant','rainbow','festival','indian','colorful'],
-  'free', 'portrait', '5:7',
+  'free', 'portrait', '9:16',
   'https://iybxwbebjgkdixdtnxal.supabase.co/storage/v1/object/public/templates/holi-party-colors.png',
   'https://iybxwbebjgkdixdtnxal.supabase.co/storage/v1/object/public/templates/holi-party-colors.png',
   array['#FF1493','#9400D3','#FF6600','#00CED1','#F5F5F5'],
@@ -341,7 +341,7 @@ insert into templates (
 (
   'bday-18th-cinema-bash', '18th Birthday — Cinema Bash', 'birthday',
   array['adults','milestone','18th'], array['cinema','dark','gold','theatrical','dramatic','marquee'],
-  'free', 'portrait', '5:7',
+  'free', 'portrait', '9:16',
   'https://iybxwbebjgkdixdtnxal.supabase.co/storage/v1/object/public/templates/bday-18th-cinema-bash.png',
   'https://iybxwbebjgkdixdtnxal.supabase.co/storage/v1/object/public/templates/bday-18th-cinema-bash.png',
   array['#2D0030','#8B0000','#C9A84C','#FFFFFF'],
@@ -385,7 +385,7 @@ insert into templates (
 (
   'kbday-superhero-4th-boy', '4th Birthday — Superhero Bash', 'kids_birthday',
   array['kids','boys','superhero'], array['superhero','comics','blue','action','bold','boys'],
-  'free', 'portrait', '5:7',
+  'free', 'portrait', '9:16',
   'https://iybxwbebjgkdixdtnxal.supabase.co/storage/v1/object/public/templates/kbday-superhero-4th-boy.png',
   'https://iybxwbebjgkdixdtnxal.supabase.co/storage/v1/object/public/templates/kbday-superhero-4th-boy.png',
   array['#1A3A8C','#CC0000','#FFD700','#F5F5F0'],
@@ -406,7 +406,7 @@ insert into templates (
 (
   'anniv-25th-sage-dinner', '25th Anniversary — Sage Champagne', 'anniversary',
   array['25th','silver','dinner'], array['sage','green','watercolor','elegant','dining','champagne'],
-  'free', 'portrait', '5:7',
+  'free', 'portrait', '9:16',
   'https://iybxwbebjgkdixdtnxal.supabase.co/storage/v1/object/public/templates/anniv-25th-sage-dinner.png',
   'https://iybxwbebjgkdixdtnxal.supabase.co/storage/v1/object/public/templates/anniv-25th-sage-dinner.png',
   array['#F5F0E8','#C9A84C','#4A6B4A','#1A1A1A'],
@@ -428,7 +428,7 @@ insert into templates (
 (
   'bday-18th-blackgold', '18th Birthday — Black Gold', 'birthday',
   array['adults','milestone','18th'], array['black','gold','balloons','elegant','luxury','dark'],
-  'free', 'portrait', '5:7',
+  'free', 'portrait', '9:16',
   'https://iybxwbebjgkdixdtnxal.supabase.co/storage/v1/object/public/templates/bday-18th-blackgold.png',
   'https://iybxwbebjgkdixdtnxal.supabase.co/storage/v1/object/public/templates/bday-18th-blackgold.png',
   array['#000000','#C9A84C','#FFFFFF'],
@@ -455,4 +455,6 @@ on conflict (id) do update set
   style_tags    = excluded.style_tags,
   fonts_used    = excluded.fonts_used,
   bg_image_url  = excluded.bg_image_url,
-  thumb_url     = excluded.thumb_url;
+  thumb_url     = excluded.thumb_url,
+  aspect_ratio  = excluded.aspect_ratio,
+  orientation   = excluded.orientation;
