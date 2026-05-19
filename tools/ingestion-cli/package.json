@@ -1,0 +1,26 @@
+{
+  "name": "invitely-ingestion-cli",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "ingest": "ts-node src/ingest.ts",
+    "review": "ts-node src/review.ts",
+    "batch":  "ts-node src/batch.ts",
+    "compare":"ts-node src/compare.ts"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.49.0",
+    "commander": "^12.1.0",
+    "dotenv": "^16.4.5",
+    "node-fetch": "^2.7.0",
+    "openai": "^4.96.0",
+    "sharp": "^0.33.5",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "@types/node-fetch": "^2.6.11",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.2"
+  }
+}

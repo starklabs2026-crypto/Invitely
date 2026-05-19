@@ -12,6 +12,7 @@ import { AppHeader } from '@/components/layout/AppHeader';
 import { EditorCanvas } from '@/components/editor/EditorCanvas';
 import { SelectionBox } from '@/components/editor/SelectionBox';
 import { TextZone } from '@/components/editor/TextZone';
+import { StyledTextZone } from '@/components/editor/StyledTextZone';
 import { TextEditModal } from '@/components/editor/TextEditModal';
 import { EditorToolbar } from '@/components/editor/EditorToolbar';
 import { useEditor } from '@/hooks/useEditor';
@@ -128,16 +129,20 @@ export default function EditorScreen() {
             />
           )}
 
-          {fontsLoaded && editor.zones.map((zone) => (
-            <TextZone
-              key={zone.id}
-              zone={zone}
-              isSelected={zone.id === editor.selectedZoneId}
-              onSelect={() => editor.selectZone(zone.id)}
-              onMove={(x, y) => editor.updateZone(zone.id, { x, y })}
-              canvasHeight={canvasHeight}
-            />
-          ))}
+          {fontsLoaded && editor.zones.map((zone) => {
+            const hasEffects = !!(zone.effects?.shadow || zone.effects?.stroke || zone.effects?.gradient || zone.effects?.glow);
+            const ZoneComponent = hasEffects ? StyledTextZone : TextZone;
+            return (
+              <ZoneComponent
+                key={zone.id}
+                zone={zone}
+                isSelected={zone.id === editor.selectedZoneId}
+                onSelect={() => editor.selectZone(zone.id)}
+                onMove={(x, y) => editor.updateZone(zone.id, { x, y })}
+                canvasHeight={canvasHeight}
+              />
+            );
+          })}
 
           {fontsLoaded && selectedZone && <SelectionBox zone={selectedZone} canvasHeight={canvasHeight} />}
         </ViewShot>
