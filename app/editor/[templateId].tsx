@@ -113,7 +113,6 @@ export default function EditorScreen() {
 
       <ScrollView
         contentContainerStyle={styles.canvasScroll}
-        scrollEnabled={!selectedZone}
         showsVerticalScrollIndicator={false}
       >
         <ViewShot
