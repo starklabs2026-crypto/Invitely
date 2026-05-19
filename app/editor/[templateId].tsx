@@ -26,7 +26,7 @@ export default function EditorScreen() {
   const { templateId } = useLocalSearchParams<{ templateId: string }>();
   const { data: template } = useTemplate(templateId!);
   const editor = useEditor();
-  useEditorFonts();
+  const { fontsLoaded } = useEditorFonts();
   const { user } = useAuth();
   const setCapturedUri = useEditorStore((s) => s.setCapturedUri);
   const cardId = useEditorStore((s) => s.cardId);
@@ -128,7 +128,7 @@ export default function EditorScreen() {
             />
           )}
 
-          {editor.zones.map((zone) => (
+          {fontsLoaded && editor.zones.map((zone) => (
             <TextZone
               key={zone.id}
               zone={zone}
@@ -139,7 +139,7 @@ export default function EditorScreen() {
             />
           ))}
 
-          {selectedZone && <SelectionBox zone={selectedZone} canvasHeight={canvasHeight} />}
+          {fontsLoaded && selectedZone && <SelectionBox zone={selectedZone} canvasHeight={canvasHeight} />}
         </ViewShot>
       </ScrollView>
 

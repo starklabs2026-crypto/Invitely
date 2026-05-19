@@ -7,25 +7,51 @@ export function useEditor() {
 
   function initFromTemplate(template: Template) {
     store.setTemplate(template);
-    const zones: ZoneState[] = template.text_zones.map((tz) => ({
-      id: tz.id,
-      label: tz.label,
-      text: tz.defaultText,
-      fontFamily: tz.fontFamily,
-      fontSize: tz.fontSize,
-      color: tz.color,
-      bold: tz.bold,
-      italic: tz.italic,
-      align: tz.align,
-      letterSpacing: 0,
-      lineHeight: 1.2,
-      caps: false,
-      x: tz.x,
-      y: tz.y,
-      w: tz.w,
-      h: tz.h,
-      isSelected: false,
-    }));
+
+    // Prefer v2 zones (AI-processed) when available, fall back to v1
+    const useV2 = template.text_zones_v2 && template.text_zones_v2.length > 0;
+
+    const zones: ZoneState[] = useV2
+      ? template.text_zones_v2!.map((tz) => ({
+          id: tz.id,
+          label: tz.label,
+          text: tz.defaultText,
+          fontFamily: tz.fontFamily,
+          fontSize: tz.fontSize,
+          color: tz.color,
+          bold: tz.bold,
+          italic: tz.italic,
+          align: tz.align,
+          letterSpacing: 0,
+          lineHeight: 1.2,
+          caps: false,
+          x: tz.leftPct,
+          y: tz.topPct,
+          w: tz.widthPct,
+          h: tz.heightPct,
+          effects: tz.effects,
+          isSelected: false,
+        }))
+      : template.text_zones.map((tz) => ({
+          id: tz.id,
+          label: tz.label,
+          text: tz.defaultText,
+          fontFamily: tz.fontFamily,
+          fontSize: tz.fontSize,
+          color: tz.color,
+          bold: tz.bold,
+          italic: tz.italic,
+          align: tz.align,
+          letterSpacing: 0,
+          lineHeight: 1.2,
+          caps: false,
+          x: tz.x,
+          y: tz.y,
+          w: tz.w,
+          h: tz.h,
+          isSelected: false,
+        }));
+
     store.initZones(zones);
   }
 

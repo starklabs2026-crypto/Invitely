@@ -1,3 +1,5 @@
+import type { TextEffects } from './template';
+
 export interface ZoneState {
   id: string;
   label: string;
@@ -16,6 +18,7 @@ export interface ZoneState {
   w: number;
   h: number;
   isSelected: boolean;
+  effects?: TextEffects;
 }
 
 export type ToolbarAction =

@@ -60,6 +60,7 @@ export function TextZone({ zone, isSelected, onSelect, onMove, canvasHeight }: T
   const height = Math.max(24, (zone.h / 100) * canvasHeight);
   const displayText = zone.caps ? zone.text.toUpperCase() : zone.text;
 
+  const shadow = zone.effects?.shadow;
   const textStyle = {
     fontSize: zone.fontSize,
     color: zone.color,
@@ -68,6 +69,11 @@ export function TextZone({ zone, isSelected, onSelect, onMove, canvasHeight }: T
     fontStyle: zone.italic ? ('italic' as const) : ('normal' as const),
     textAlign: zone.align,
     letterSpacing: zone.letterSpacing,
+    ...(shadow && {
+      textShadowOffset: { width: shadow.offsetX, height: shadow.offsetY },
+      textShadowRadius: shadow.blur,
+      textShadowColor: shadow.color,
+    }),
   };
 
   return (

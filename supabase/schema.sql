@@ -29,7 +29,13 @@ create table if not exists templates (
   fonts_used      text[]   default '{}',
   usage_count     integer  default 0,
   is_active       boolean  default true,
-  created_at      timestamptz default now()
+  created_at      timestamptz default now(),
+
+  -- Ingestion pipeline fields (populated after AI processing)
+  text_zones_v2   jsonb,
+  draft_zones     jsonb,
+  review_status   text default 'manual' check (review_status in ('manual','ai_draft','pending_review','approved')),
+  ai_confidence   float
 );
 
 create table if not exists saved_cards (
