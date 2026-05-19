@@ -35,7 +35,7 @@ export const ProposedZoneSchema = z.object({
   align:       z.enum(['left', 'center', 'right']),
   bold:        z.boolean(),
   italic:      z.boolean(),
-  effects:     TextEffectsSchema.optional(),
+  effects:     TextEffectsSchema.nullish(),
   confidence:  z.number().min(0).max(1),
 });
 

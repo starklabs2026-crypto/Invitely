@@ -82,7 +82,7 @@ export async function removeTextFromBackground(
     response_format: 'b64_json',
   });
 
-  const b64 = editResponse.data[0]?.b64_json;
+  const b64 = editResponse.data?.[0]?.b64_json;
   if (!b64) throw new Error('DALL-E 2 returned no image data');
 
   // 7. Restore to original dimensions: unembed padding

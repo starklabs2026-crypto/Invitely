@@ -13,9 +13,10 @@ program
   .description('Process a single template through GPT-4o and write AI zone proposals to DB')
   .requiredOption('-t, --template <id>', 'Template ID (e.g. bday-30th-sarah)')
   .option('--remove-text', 'Run DALL-E 2 inpainting to remove baked-in text from background', false)
+  .option('--hint <text>', 'Additional placement hint appended to the GPT-4o user message')
   .parse(process.argv);
 
-const opts = program.opts<{ template: string; removeText: boolean }>();
+const opts = program.opts<{ template: string; removeText: boolean; hint?: string }>();
 
 async function run() {
   const templateId = opts.template;
@@ -40,7 +41,7 @@ async function run() {
 
   try {
     // 3. GPT-4o vision analysis
-    const analysis = await analyzeTemplate(template.bg_image_url, templateId);
+    const analysis = await analyzeTemplate(template.bg_image_url, templateId, opts.hint);
 
     // 4. Resolve fonts — ensure every zone uses a font from our bundle
     const resolvedZones = analysis.zones.map((zone) => ({

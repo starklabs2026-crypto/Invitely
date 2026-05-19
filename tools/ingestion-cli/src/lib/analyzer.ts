@@ -1,13 +1,31 @@
+import fetch from 'node-fetch';
 import { openai } from './clients';
 import { BUNDLED_FONTS } from '../config';
 import { AnalysisResultSchema, type AnalysisResult } from '../types';
+
+async function toBase64DataUrl(imageUrl: string): Promise<string> {
+  const res = await fetch(imageUrl);
+  if (!res.ok) throw new Error(`Failed to download image (${res.status}): ${imageUrl}`);
+  const buffer = await res.buffer();
+  const mime = res.headers.get('content-type') ?? 'image/png';
+  return `data:${mime};base64,${buffer.toString('base64')}`;
+}
 
 const SYSTEM_PROMPT = `
 You are an expert invitation card designer analyzing a background image.
 This image is the background for a 9:16 portrait digital invitation card (canvas ~390×844 px).
 
+CRITICAL ILLUSTRATION-AVOIDANCE RULES (follow these before everything else):
+- Scan the image for illustrations, characters, objects, flowers, animals, bottles, glasses, balloons, banners, and decorative artwork.
+- NEVER place any text zone bounding box over an illustration or decorative element — not even partially.
+- If an illustration occupies the left side → place ALL zones on the right or in empty areas.
+- If an illustration occupies the right side → place ALL zones on the left or in empty areas.
+- If an illustration occupies the center → place zones in the top and bottom empty areas only.
+- For pre-designed templates with built-in text frames (scroll banners, ribbons, empty oval/rect frames): place zones INSIDE those frames, sized to fit within the frame, not overlapping its borders.
+- Before finalising each zone, verify its entire bounding box contains only solid color, texture, or subtle pattern — no artwork.
+
 Your job:
-1. Identify 5–9 natural text areas that respect the visual composition (empty regions, decorative frames, clear spaces).
+1. Identify 5–9 natural text areas that strictly follow the illustration-avoidance rules above.
 2. For each zone pick the most fitting font from the AVAILABLE FONTS list — choose based on the aesthetic (formal, playful, romantic, etc.).
 3. Choose text colors that are legible against the background, preferring colors already present in the palette.
 4. Suggest subtle effects (shadow or stroke) where they would help text blend naturally — do not over-effect.
@@ -49,9 +67,18 @@ Return ONLY a valid JSON object — no markdown, no explanation:
 
 export async function analyzeTemplate(
   imageUrl: string,
-  templateId: string
+  templateId: string,
+  hint?: string
 ): Promise<AnalysisResult> {
+  console.log(`  → Downloading image for ${templateId}...`);
+  const dataUrl = await toBase64DataUrl(imageUrl);
+
   console.log(`  → Sending ${templateId} to GPT-4o Vision...`);
+
+  const userText = [
+    `Analyze this invitation card background (template id: ${templateId}). Return only the JSON object described in the system prompt.`,
+    hint ? `ADDITIONAL PLACEMENT HINT: ${hint}` : '',
+  ].filter(Boolean).join('\n\n');
 
   const response = await openai.chat.completions.create({
     model: 'gpt-4o',
@@ -64,11 +91,11 @@ export async function analyzeTemplate(
         content: [
           {
             type: 'image_url',
-            image_url: { url: imageUrl, detail: 'high' },
+            image_url: { url: dataUrl, detail: 'high' },
           },
           {
             type: 'text',
-            text: `Analyze this invitation card background (template id: ${templateId}). Return only the JSON object described in the system prompt.`,
+            text: userText,
           },
         ],
       },
