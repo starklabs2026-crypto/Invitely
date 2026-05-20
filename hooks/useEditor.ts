@@ -65,6 +65,8 @@ export function useEditor() {
     initFromTemplate,
     selectZone: store.selectZone,
     updateZone: store.updateZone,
+    updateZoneLive: store.updateZoneLive,
+    pushToUndo: store.pushToUndo,
     duplicateZone: store.duplicateZone,
     deleteZone: store.deleteZone,
     undo: store.undo,

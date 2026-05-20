@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { View, Text, PanResponder, StyleSheet } from 'react-native';
 import type { ZoneState } from '@/types/editor';
-import { CANVAS_WIDTH } from './EditorCanvas';
+import { scaledFontSize } from '@/utils/zoneGeometry';
 
 interface TextZoneProps {
   zone: ZoneState;
@@ -9,15 +9,18 @@ interface TextZoneProps {
   onSelect: () => void;
   onMove: (x: number, y: number) => void;
   canvasHeight: number;
+  canvasWidth: number;
 }
 
-export function TextZone({ zone, isSelected, onSelect, onMove, canvasHeight }: TextZoneProps) {
+export function TextZone({ zone, isSelected, onSelect, onMove, canvasHeight, canvasWidth }: TextZoneProps) {
   const isSelectedRef = useRef(isSelected);
   isSelectedRef.current = isSelected;
   const zoneRef = useRef(zone);
   zoneRef.current = zone;
-  const resolvedHeightRef = useRef(canvasHeight);
-  resolvedHeightRef.current = canvasHeight;
+  const canvasHeightRef = useRef(canvasHeight);
+  canvasHeightRef.current = canvasHeight;
+  const canvasWidthRef = useRef(canvasWidth);
+  canvasWidthRef.current = canvasWidth;
   const onSelectRef = useRef(onSelect);
   onSelectRef.current = onSelect;
   const onMoveRef = useRef(onMove);
@@ -25,7 +28,7 @@ export function TextZone({ zone, isSelected, onSelect, onMove, canvasHeight }: T
 
   const totalMovement = useRef(0);
   const initialPos = useRef({ x: 0, y: 0 });
-  const DAMPING = 0.5;
+  const DAMPING = 1;
 
   const panResponder = useRef(
     PanResponder.create({
@@ -39,8 +42,8 @@ export function TextZone({ zone, isSelected, onSelect, onMove, canvasHeight }: T
       onPanResponderMove: (_, g) => {
         totalMovement.current = Math.sqrt(g.dx ** 2 + g.dy ** 2);
         const z = zoneRef.current;
-        const newX = initialPos.current.x + (g.dx / CANVAS_WIDTH) * 100 * DAMPING;
-        const newY = initialPos.current.y + (g.dy / resolvedHeightRef.current) * 100 * DAMPING;
+        const newX = initialPos.current.x + (g.dx / canvasWidthRef.current) * 100 * DAMPING;
+        const newY = initialPos.current.y + (g.dy / canvasHeightRef.current) * 100 * DAMPING;
         onMoveRef.current(
           Math.max(0, Math.min(100 - z.w, newX)),
           Math.max(0, Math.min(100 - z.h, newY))
@@ -54,15 +57,17 @@ export function TextZone({ zone, isSelected, onSelect, onMove, canvasHeight }: T
     })
   ).current;
 
-  const left = (zone.x / 100) * CANVAS_WIDTH;
+  const left = (zone.x / 100) * canvasWidth;
   const top = (zone.y / 100) * canvasHeight;
-  const width = (zone.w / 100) * CANVAS_WIDTH;
+  const width = (zone.w / 100) * canvasWidth;
   const height = Math.max(24, (zone.h / 100) * canvasHeight);
   const displayText = zone.caps ? zone.text.toUpperCase() : zone.text;
 
   const shadow = zone.effects?.shadow;
+  const scaledSize = scaledFontSize(zone.fontSize, canvasWidth, 390);
   const textStyle = {
-    fontSize: zone.fontSize,
+    fontSize: scaledSize,
+    lineHeight: zone.lineHeight * scaledSize,
     color: zone.color,
     fontFamily: zone.fontFamily,
     fontWeight: zone.bold ? ('bold' as const) : ('normal' as const),

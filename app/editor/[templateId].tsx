@@ -1,8 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import {
   StyleSheet,
-  ScrollView,
   Alert,
+  View,
+  useWindowDimensions,
 } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -13,6 +14,7 @@ import { EditorCanvas } from '@/components/editor/EditorCanvas';
 import { SelectionBox } from '@/components/editor/SelectionBox';
 import { TextZone } from '@/components/editor/TextZone';
 import { StyledTextZone } from '@/components/editor/StyledTextZone';
+import { SkiaTextZone } from '@/components/editor/SkiaTextZone';
 import { TextEditModal } from '@/components/editor/TextEditModal';
 import { EditorToolbar } from '@/components/editor/EditorToolbar';
 import { useEditor } from '@/hooks/useEditor';
@@ -35,14 +37,33 @@ export default function EditorScreen() {
   const [saving, setSaving] = useState(false);
   const [draftSaving, setDraftSaving] = useState(false);
   const [editingZoneId, setEditingZoneId] = useState<string | null>(null);
+  const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
   const viewShotRef = useRef<ViewShot>(null);
-  const canvasHeight = getCanvasHeight(template?.aspect_ratio);
+  const { width: screenWidth } = useWindowDimensions();
 
   useEffect(() => {
     if (template && editor.template?.id !== template.id) {
       editor.initFromTemplate(template);
     }
   }, [template]);
+
+  const naturalCanvasHeight = getCanvasHeight(template?.aspect_ratio);
+
+  // Fit the entire canvas within the container — no scroll, so PanResponder works cleanly
+  const { canvasWidth, canvasHeight } = useMemo(() => {
+    if (containerSize.width === 0 || containerSize.height === 0) {
+      return { canvasWidth: screenWidth, canvasHeight: naturalCanvasHeight };
+    }
+    const scale = Math.min(
+      containerSize.width / screenWidth,
+      containerSize.height / naturalCanvasHeight,
+      1,
+    );
+    return {
+      canvasWidth: Math.floor(screenWidth * scale),
+      canvasHeight: Math.floor(naturalCanvasHeight * scale),
+    };
+  }, [containerSize, screenWidth, naturalCanvasHeight]);
 
   const editingZone = editingZoneId
     ? editor.zones.find((z) => z.id === editingZoneId) ?? null
@@ -76,6 +97,7 @@ export default function EditorScreen() {
     editor.selectZone(null);
     setSaving(true);
     try {
+      await new Promise((r) => setTimeout(r, 150));
       const uri = await viewShotRef.current?.capture?.();
       if (uri) setCapturedUri(uri);
       if (user && editor.template) {
@@ -92,7 +114,8 @@ export default function EditorScreen() {
   const selectedZone = editor.selectedZone;
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    // edges={['bottom']} — AppHeader handles the top inset via useSafeAreaInsets()
+    <SafeAreaView style={styles.safe} edges={['bottom']}>
       <AppHeader
         showBack
         showUndo
@@ -111,26 +134,36 @@ export default function EditorScreen() {
         }}
       />
 
-      <ScrollView
-        contentContainerStyle={styles.canvasScroll}
-        showsVerticalScrollIndicator={false}
+      {/* Canvas container fills all remaining space between header and toolbar */}
+      <View
+        style={styles.canvasContainer}
+        onLayout={(e) => {
+          const { width, height } = e.nativeEvent.layout;
+          setContainerSize((prev) =>
+            prev.width === width && prev.height === height ? prev : { width, height }
+          );
+        }}
       >
         <ViewShot
           ref={viewShotRef}
           options={{ format: 'png', quality: 1.0 }}
-          style={styles.canvasWrapper}
+          style={{ width: canvasWidth, height: canvasHeight }}
         >
           {template && (
             <EditorCanvas
               bgImageUrl={template.bg_image_url}
               onCanvasTap={() => editor.selectZone(null)}
               aspectRatio={template.aspect_ratio}
+              canvasWidth={canvasWidth}
+              canvasHeight={canvasHeight}
             />
           )}
 
           {fontsLoaded && editor.zones.map((zone) => {
-            const hasEffects = !!(zone.effects?.shadow || zone.effects?.stroke || zone.effects?.gradient || zone.effects?.glow);
-            const ZoneComponent = hasEffects ? StyledTextZone : TextZone;
+            const fx = zone.effects;
+            const needsSkia    = !!(fx?.gradient || fx?.glow || fx?.stroke);
+            const hasShadowOnly = !!fx?.shadow && !needsSkia;
+            const ZoneComponent = needsSkia ? SkiaTextZone : hasShadowOnly ? StyledTextZone : TextZone;
             return (
               <ZoneComponent
                 key={zone.id}
@@ -139,13 +172,28 @@ export default function EditorScreen() {
                 onSelect={() => editor.selectZone(zone.id)}
                 onMove={(x, y) => editor.updateZone(zone.id, { x, y })}
                 canvasHeight={canvasHeight}
+                canvasWidth={canvasWidth}
               />
             );
           })}
 
-          {fontsLoaded && selectedZone && <SelectionBox zone={selectedZone} canvasHeight={canvasHeight} />}
+          {fontsLoaded && selectedZone && (
+            <SelectionBox
+              zone={selectedZone}
+              canvasHeight={canvasHeight}
+              canvasWidth={canvasWidth}
+              onResizeStart={() => {
+                editor.pushToUndo();
+              }}
+              onResize={(updates) => {
+                if (editor.selectedZoneId) {
+                  editor.updateZoneLive(editor.selectedZoneId, updates);
+                }
+              }}
+            />
+          )}
         </ViewShot>
-      </ScrollView>
+      </View>
 
       <EditorToolbar
         selectedZone={selectedZone}
@@ -183,10 +231,10 @@ export default function EditorScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: COLORS.ink },
-  canvasScroll: {
+  canvasContainer: {
+    flex: 1,
+    backgroundColor: COLORS.ink,
     alignItems: 'center',
-  },
-  canvasWrapper: {
-    position: 'relative',
+    justifyContent: 'center',
   },
 });

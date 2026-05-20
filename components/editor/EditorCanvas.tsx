@@ -24,28 +24,31 @@ interface EditorCanvasProps {
   bgImageUrl: string;
   onCanvasTap: () => void;
   aspectRatio?: string;
+  canvasWidth?: number;
+  canvasHeight?: number;
 }
 
 export const EditorCanvas = forwardRef<View, EditorCanvasProps>(
-  ({ bgImageUrl, onCanvasTap, aspectRatio }, ref) => {
+  ({ bgImageUrl, onCanvasTap, aspectRatio, canvasWidth, canvasHeight: canvasHeightProp }, ref) => {
     const bgImage = useImage(bgImageUrl);
-    const canvasHeight = getCanvasHeight(aspectRatio);
+    const w = canvasWidth ?? CANVAS_WIDTH;
+    const h = canvasHeightProp ?? getCanvasHeight(aspectRatio);
 
     return (
       <View
         ref={ref}
-        style={{ width: CANVAS_WIDTH, height: canvasHeight }}
+        style={{ width: w, height: h }}
         onTouchStart={onCanvasTap}
         collapsable={false}
       >
-        <Canvas style={{ width: CANVAS_WIDTH, height: canvasHeight }}>
+        <Canvas style={{ width: w, height: h }}>
           {bgImage ? (
             <SkiaImage
               image={bgImage}
               x={0}
               y={0}
-              width={CANVAS_WIDTH}
-              height={canvasHeight}
+              width={w}
+              height={h}
               fit="cover"
             />
           ) : (

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { View, Image, Text, StyleSheet } from 'react-native';
 import type { Template } from '@/types/template';
-import { CANVAS_WIDTH } from '@/components/editor/EditorCanvas';
 
 interface Props {
   template: Template;
@@ -35,8 +34,7 @@ export function TemplateThumbnail({ template }: Props) {
           const top    = (zone.topPct    / 100) * size.height;
           const width  = (zone.widthPct  / 100) * size.width;
           const height = Math.max(4, (zone.heightPct / 100) * size.height);
-          const scale  = size.width / CANVAS_WIDTH;
-          const fontSize = Math.max(4, Math.round(zone.fontSize * scale));
+          const fontSize = Math.max(4, Math.round(zone.fontSize * (size.width / 390)));
 
           return (
             <Text
@@ -68,8 +66,7 @@ export function TemplateThumbnail({ template }: Props) {
           const top    = (zone.y / 100) * size.height;
           const width  = (zone.w / 100) * size.width;
           const height = Math.max(4, (zone.h / 100) * size.height);
-          const scale  = size.width / CANVAS_WIDTH;
-          const fontSize = Math.max(4, Math.round(zone.fontSize * scale));
+          const fontSize = Math.max(4, Math.round(zone.fontSize * (size.width / 390)));
 
           return (
             <Text

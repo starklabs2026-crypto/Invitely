@@ -10,6 +10,8 @@ interface EditorStore extends EditorState {
   initZones: (zones: ZoneState[]) => void;
   selectZone: (id: string | null) => void;
   updateZone: (id: string, updates: Partial<ZoneState>) => void;
+  updateZoneLive: (id: string, updates: Partial<ZoneState>) => void;
+  pushToUndo: () => void;
   duplicateZone: (id: string) => void;
   deleteZone: (id: string) => void;
   setCapturedUri: (uri: string | null) => void;
@@ -52,6 +54,19 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       redoStack: [],
       zones: zones.map((z) => (z.id === id ? { ...z, ...updates } : z)),
     });
+  },
+
+  // Live update during drag — no undo entry (caller must call pushToUndo first)
+  updateZoneLive: (id, updates) => {
+    set((state) => ({
+      zones: state.zones.map((z) => (z.id === id ? { ...z, ...updates } : z)),
+    }));
+  },
+
+  // Snapshot current zones to undo stack without changing zones (call before a drag begins)
+  pushToUndo: () => {
+    const { zones, undoStack } = get();
+    set({ undoStack: [...undoStack.slice(-19), zones], redoStack: [] });
   },
 
   duplicateZone: (id) => {

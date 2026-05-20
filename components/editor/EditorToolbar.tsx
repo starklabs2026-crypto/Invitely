@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors';
 import { FONTS } from '@/constants/fonts';
@@ -14,36 +14,85 @@ interface EditorToolbarProps {
   onEdit: () => void;
 }
 
-const FONT_OPTIONS: { key: string; label: string }[] = [
-  { key: 'DMSans_400Regular',              label: 'DM Sans' },
-  { key: 'DMSans_700Bold',                 label: 'DM Sans Bold' },
-  { key: 'PlayfairDisplay_400Regular',     label: 'Playfair' },
-  { key: 'PlayfairDisplay_700Bold',        label: 'Playfair Bold' },
-  { key: 'CormorantGaramond_400Regular',   label: 'Cormorant' },
-  { key: 'CormorantGaramond_700Bold',      label: 'Cormorant Bold' },
-  { key: 'GreatVibes_400Regular',          label: 'Great Vibes' },
-  { key: 'DancingScript_400Regular',       label: 'Dancing Script' },
-  { key: 'DancingScript_700Bold',          label: 'Dancing Bold' },
-  { key: 'Cinzel_400Regular',              label: 'Cinzel' },
-  { key: 'Cinzel_700Bold',                 label: 'Cinzel Bold' },
-  { key: 'Lora_400Regular',               label: 'Lora' },
-  { key: 'Lora_700Bold',                  label: 'Lora Bold' },
-  { key: 'Montserrat_400Regular',          label: 'Montserrat' },
-  { key: 'Montserrat_700Bold',             label: 'Montserrat Bold' },
-  { key: 'Sacramento_400Regular',          label: 'Sacramento' },
-  { key: 'Raleway_400Regular',             label: 'Raleway' },
-  { key: 'Raleway_700Bold',               label: 'Raleway Bold' },
-  { key: 'JosefinSans_400Regular',         label: 'Josefin Sans' },
-  { key: 'JosefinSans_700Bold',            label: 'Josefin Bold' },
+const FONT_OPTIONS: { key: string; label: string; category: string }[] = [
+  // Sans-serif
+  { key: 'DMSans_400Regular',              label: 'DM Sans',           category: 'Sans-serif' },
+  { key: 'DMSans_700Bold',                 label: 'DM Sans Bold',      category: 'Sans-serif' },
+  { key: 'Montserrat_400Regular',          label: 'Montserrat',        category: 'Sans-serif' },
+  { key: 'Montserrat_700Bold',             label: 'Montserrat Bold',   category: 'Sans-serif' },
+  { key: 'Raleway_400Regular',             label: 'Raleway',           category: 'Sans-serif' },
+  { key: 'Raleway_700Bold',               label: 'Raleway Bold',      category: 'Sans-serif' },
+  { key: 'JosefinSans_400Regular',         label: 'Josefin Sans',      category: 'Sans-serif' },
+  { key: 'JosefinSans_700Bold',            label: 'Josefin Bold',      category: 'Sans-serif' },
+  { key: 'Oswald_400Regular',              label: 'Oswald',            category: 'Sans-serif' },
+  { key: 'Oswald_700Bold',                 label: 'Oswald Bold',       category: 'Sans-serif' },
+  { key: 'BebasNeue_400Regular',           label: 'Bebas Neue',        category: 'Sans-serif' },
+  { key: 'AmaticSC_400Regular',            label: 'Amatic SC',         category: 'Sans-serif' },
+  { key: 'AmaticSC_700Bold',              label: 'Amatic SC Bold',    category: 'Sans-serif' },
+  { key: 'PatrickHand_400Regular',         label: 'Patrick Hand',      category: 'Sans-serif' },
+  { key: 'Bangers_400Regular',             label: 'Bangers',           category: 'Sans-serif' },
+  // Serif
+  { key: 'PlayfairDisplay_400Regular',     label: 'Playfair',          category: 'Serif' },
+  { key: 'PlayfairDisplay_700Bold',        label: 'Playfair Bold',     category: 'Serif' },
+  { key: 'CormorantGaramond_400Regular',   label: 'Cormorant',         category: 'Serif' },
+  { key: 'CormorantGaramond_700Bold',      label: 'Cormorant Bold',    category: 'Serif' },
+  { key: 'CormorantSC_400Regular',         label: 'Cormorant SC',      category: 'Serif' },
+  { key: 'CormorantSC_700Bold',            label: 'Cormorant SC Bold', category: 'Serif' },
+  { key: 'Cinzel_400Regular',              label: 'Cinzel',            category: 'Serif' },
+  { key: 'Cinzel_700Bold',                 label: 'Cinzel Bold',       category: 'Serif' },
+  { key: 'Lora_400Regular',               label: 'Lora',              category: 'Serif' },
+  { key: 'Lora_700Bold',                  label: 'Lora Bold',         category: 'Serif' },
+  { key: 'BodoniModa_400Regular',          label: 'Bodoni Moda',       category: 'Serif' },
+  { key: 'BodoniModa_700Bold',             label: 'Bodoni Moda Bold',  category: 'Serif' },
+  { key: 'Prata_400Regular',               label: 'Prata',             category: 'Serif' },
+  { key: 'EBGaramond_400Regular',          label: 'EB Garamond',       category: 'Serif' },
+  { key: 'Ultra_400Regular',               label: 'Ultra',             category: 'Serif' },
+  { key: 'Rye_400Regular',                 label: 'Rye',               category: 'Serif' },
+  // Script
+  { key: 'GreatVibes_400Regular',          label: 'Great Vibes',       category: 'Script' },
+  { key: 'DancingScript_400Regular',       label: 'Dancing Script',    category: 'Script' },
+  { key: 'DancingScript_700Bold',          label: 'Dancing Bold',      category: 'Script' },
+  { key: 'Sacramento_400Regular',          label: 'Sacramento',        category: 'Script' },
+  { key: 'Allura_400Regular',              label: 'Allura',            category: 'Script' },
+  { key: 'KaushanScript_400Regular',       label: 'Kaushan Script',    category: 'Script' },
+  { key: 'AlexBrush_400Regular',           label: 'Alex Brush',        category: 'Script' },
+  { key: 'PinyonScript_400Regular',        label: 'Pinyon Script',     category: 'Script' },
+  { key: 'Caveat_400Regular',              label: 'Caveat',            category: 'Script' },
+  { key: 'Caveat_700Bold',                 label: 'Caveat Bold',       category: 'Script' },
+  // Display
+  { key: 'PermanentMarker_400Regular',     label: 'Permanent Marker',  category: 'Display' },
+  { key: 'BungeeInline_400Regular',        label: 'Bungee Inline',     category: 'Display' },
+  { key: 'Spirax_400Regular',              label: 'Spirax',            category: 'Display' },
 ];
 
 const COLOR_OPTIONS = [
-  '#1A1614', '#FFFFFF', '#C96442', '#E8A87C', '#C9A96E',
-  '#3D8A8A', '#8B7DB8', '#C96480', '#5A8A5A', '#E53935',
-  '#1A2744', '#C9A84C', '#4A7C3F', '#2D0030', '#000000',
+  '#000000', '#FFFFFF', '#1A1614', '#4A4A4A', '#9E9E9E',
+  '#E53935', '#FF7043', '#FFA726', '#FFEE58', '#9CCC65',
+  '#26A69A', '#42A5F5', '#5C6BC0', '#AB47BC', '#EC407A',
+  '#C96442', '#E8A87C', '#C9A96E', '#1A2744', '#2D0030',
 ];
 
-const SIZE_OPTIONS = [10, 12, 14, 16, 18, 20, 24, 28, 32, 36, 42, 48, 56, 64, 72];
+// Auto-generated from FONT_OPTIONS: regular ↔ bold variant pairs
+const REGULAR_TO_BOLD: Record<string, string> = {};
+const BOLD_TO_REGULAR: Record<string, string> = {};
+FONT_OPTIONS.forEach(({ key }) => {
+  if (key.endsWith('_400Regular')) {
+    const boldKey = key.replace('_400Regular', '_700Bold');
+    if (FONT_OPTIONS.some((f) => f.key === boldKey)) {
+      REGULAR_TO_BOLD[key] = boldKey;
+      BOLD_TO_REGULAR[boldKey] = key;
+    }
+  }
+});
+
+function resolveBoldFont(fontFamily: string, bold: boolean): string {
+  if (bold) return REGULAR_TO_BOLD[fontFamily] ?? fontFamily;
+  return BOLD_TO_REGULAR[fontFamily] ?? fontFamily;
+}
+
+function isValidHex(value: string): boolean {
+  return /^#[0-9A-Fa-f]{6}$/.test(value) || /^#[0-9A-Fa-f]{3}$/.test(value);
+}
 
 const ALIGN_ICONS: Record<string, React.ComponentProps<typeof Ionicons>['name']> = {
   left: 'reorder-four-outline',
@@ -60,13 +109,13 @@ export function EditorToolbar({
 }: EditorToolbarProps) {
   const [fontSheetOpen, setFontSheetOpen] = useState(false);
   const [colorSheetOpen, setColorSheetOpen] = useState(false);
-  const [sizeSheetOpen, setSizeSheetOpen] = useState(false);
+  const [customColor, setCustomColor] = useState('');
 
   if (!selectedZone) return null;
 
   const nextAlign = selectedZone.align === 'left' ? 'center' : selectedZone.align === 'center' ? 'right' : 'left';
 
-  const row1Items = [
+  const items = [
     {
       label: 'Edit',
       icon: 'create-outline' as const,
@@ -78,11 +127,6 @@ export function EditorToolbar({
       onPress: () => setFontSheetOpen(true),
     },
     {
-      label: `${selectedZone.fontSize}px`,
-      icon: 'expand-outline' as const,
-      onPress: () => setSizeSheetOpen(true),
-    },
-    {
       label: 'Color',
       icon: 'color-palette-outline' as const,
       onPress: () => setColorSheetOpen(true),
@@ -92,7 +136,10 @@ export function EditorToolbar({
       label: 'Bold',
       customLabel: 'B',
       icon: null as null,
-      onPress: () => onUpdateZone({ bold: !selectedZone.bold }),
+      onPress: () => {
+        const newBold = !selectedZone.bold;
+        onUpdateZone({ bold: newBold, fontFamily: resolveBoldFont(selectedZone.fontFamily, newBold) });
+      },
       active: selectedZone.bold,
     },
     {
@@ -102,9 +149,6 @@ export function EditorToolbar({
       onPress: () => onUpdateZone({ italic: !selectedZone.italic }),
       active: selectedZone.italic,
     },
-  ];
-
-  const row2Items = [
     {
       label: selectedZone.align === 'left' ? 'Left' : selectedZone.align === 'center' ? 'Center' : 'Right',
       icon: ALIGN_ICONS[selectedZone.align] as React.ComponentProps<typeof Ionicons>['name'],
@@ -113,8 +157,7 @@ export function EditorToolbar({
     {
       label: 'Spacing',
       icon: 'git-commit-outline' as const,
-      onPress: () =>
-        onUpdateZone({ letterSpacing: selectedZone.letterSpacing === 0 ? 2 : 0 }),
+      onPress: () => onUpdateZone({ letterSpacing: selectedZone.letterSpacing === 0 ? 2 : 0 }),
       active: selectedZone.letterSpacing > 0,
     },
     {
@@ -148,13 +191,16 @@ export function EditorToolbar({
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          style={styles.row}
           contentContainerStyle={styles.rowContent}
         >
-          {row1Items.map((item) => (
+          {items.map((item) => (
             <TouchableOpacity
               key={item.label}
-              style={[styles.toolButton, item.active && styles.toolButtonActive]}
+              style={[
+                styles.toolButton,
+                item.active && styles.toolButtonActive,
+                item.destructive && styles.toolButtonDestructive,
+              ]}
               onPress={item.onPress}
               activeOpacity={0.7}
             >
@@ -168,40 +214,9 @@ export function EditorToolbar({
                 <Ionicons
                   name={item.icon!}
                   size={18}
-                  color={item.active ? COLORS.white : COLORS.ink}
+                  color={item.destructive ? '#E53935' : item.active ? COLORS.white : COLORS.ink}
                 />
               )}
-              <Text style={[styles.toolLabel, item.active && styles.toolLabelActive]}>
-                {item.label}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-
-        <View style={styles.divider} />
-
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.row}
-          contentContainerStyle={styles.rowContent}
-        >
-          {row2Items.map((item) => (
-            <TouchableOpacity
-              key={item.label}
-              style={[
-                styles.toolButton,
-                item.active && styles.toolButtonActive,
-                item.destructive && styles.toolButtonDestructive,
-              ]}
-              onPress={item.onPress}
-              activeOpacity={0.7}
-            >
-              <Ionicons
-                name={item.icon}
-                size={18}
-                color={item.destructive ? '#E53935' : item.active ? COLORS.white : COLORS.ink}
-              />
               <Text
                 style={[
                   styles.toolLabel,
@@ -217,26 +232,31 @@ export function EditorToolbar({
       </View>
 
       {/* Font picker */}
-      <BottomSheet visible={fontSheetOpen} onClose={() => setFontSheetOpen(false)} height={380}>
+      <BottomSheet visible={fontSheetOpen} onClose={() => setFontSheetOpen(false)} height={480}>
         <Text style={styles.sheetTitle}>Choose Font</Text>
         <ScrollView showsVerticalScrollIndicator={false}>
-          {FONT_OPTIONS.map((f) => (
-            <TouchableOpacity
-              key={f.key}
-              style={[styles.sheetRow, selectedZone.fontFamily === f.key && styles.sheetRowActive]}
-              onPress={() => { onUpdateZone({ fontFamily: f.key }); setFontSheetOpen(false); }}
-            >
-              <Text style={[styles.sheetRowText, { fontFamily: f.key }]}>{f.label}</Text>
-              {selectedZone.fontFamily === f.key && (
-                <Ionicons name="checkmark" size={18} color={COLORS.primary} />
-              )}
-            </TouchableOpacity>
+          {(['Sans-serif', 'Serif', 'Script', 'Display'] as const).map((category) => (
+            <React.Fragment key={category}>
+              <Text style={styles.fontCategory}>{category}</Text>
+              {FONT_OPTIONS.filter((f) => f.category === category).map((f) => (
+                <TouchableOpacity
+                  key={f.key}
+                  style={[styles.sheetRow, selectedZone.fontFamily === f.key && styles.sheetRowActive]}
+                  onPress={() => { onUpdateZone({ fontFamily: f.key }); setFontSheetOpen(false); }}
+                >
+                  <Text style={[styles.sheetRowText, { fontFamily: f.key }]}>{f.label}</Text>
+                  {selectedZone.fontFamily === f.key && (
+                    <Ionicons name="checkmark" size={18} color={COLORS.primary} />
+                  )}
+                </TouchableOpacity>
+              ))}
+            </React.Fragment>
           ))}
         </ScrollView>
       </BottomSheet>
 
       {/* Color picker */}
-      <BottomSheet visible={colorSheetOpen} onClose={() => setColorSheetOpen(false)} height={220}>
+      <BottomSheet visible={colorSheetOpen} onClose={() => setColorSheetOpen(false)} height={300}>
         <Text style={styles.sheetTitle}>Choose Color</Text>
         <View style={styles.colorGrid}>
           {COLOR_OPTIONS.map((color) => (
@@ -251,26 +271,30 @@ export function EditorToolbar({
             />
           ))}
         </View>
+
+        {/* Custom hex input */}
+        <View style={styles.hexRow}>
+          <View style={[styles.hexPreview, { backgroundColor: isValidHex(customColor) ? customColor : 'transparent' }]} />
+          <TextInput
+            style={styles.hexInput}
+            value={customColor}
+            onChangeText={(t) => setCustomColor(t.startsWith('#') ? t : `#${t}`)}
+            placeholder="#RRGGBB"
+            placeholderTextColor={COLORS.muted}
+            maxLength={7}
+            autoCorrect={false}
+            autoCapitalize="characters"
+          />
+          <TouchableOpacity
+            style={[styles.hexApply, !isValidHex(customColor) && styles.hexApplyDisabled]}
+            disabled={!isValidHex(customColor)}
+            onPress={() => { onUpdateZone({ color: customColor }); setColorSheetOpen(false); setCustomColor(''); }}
+          >
+            <Text style={styles.hexApplyText}>Apply</Text>
+          </TouchableOpacity>
+        </View>
       </BottomSheet>
 
-      {/* Size picker */}
-      <BottomSheet visible={sizeSheetOpen} onClose={() => setSizeSheetOpen(false)} height={280}>
-        <Text style={styles.sheetTitle}>Choose Size</Text>
-        <ScrollView showsVerticalScrollIndicator={false}>
-          {SIZE_OPTIONS.map((size) => (
-            <TouchableOpacity
-              key={size}
-              style={[styles.sheetRow, selectedZone.fontSize === size && styles.sheetRowActive]}
-              onPress={() => { onUpdateZone({ fontSize: size }); setSizeSheetOpen(false); }}
-            >
-              <Text style={styles.sheetRowText}>{size}px</Text>
-              {selectedZone.fontSize === size && (
-                <Ionicons name="checkmark" size={18} color={COLORS.primary} />
-              )}
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      </BottomSheet>
     </>
   );
 }
@@ -282,16 +306,10 @@ const styles = StyleSheet.create({
     borderTopColor: COLORS.border,
     paddingBottom: 8,
   },
-  row: { flexShrink: 0 },
   rowContent: {
     paddingHorizontal: 8,
     paddingVertical: 6,
     gap: 4,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: COLORS.border,
-    marginHorizontal: 16,
   },
   toolButton: {
     alignItems: 'center',
@@ -335,6 +353,16 @@ const styles = StyleSheet.create({
     color: COLORS.ink,
     marginBottom: 12,
   },
+  fontCategory: {
+    fontFamily: FONTS.semibold,
+    fontSize: 11,
+    color: COLORS.primary,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+    marginTop: 16,
+    marginBottom: 4,
+    paddingHorizontal: 4,
+  },
   sheetRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -369,5 +397,43 @@ const styles = StyleSheet.create({
   colorSwatchActive: {
     borderWidth: 3,
     borderColor: COLORS.primary,
+  },
+  hexRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 16,
+    gap: 8,
+  },
+  hexPreview: {
+    width: 36,
+    height: 36,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  hexInput: {
+    flex: 1,
+    height: 36,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    fontFamily: FONTS.regular,
+    fontSize: 14,
+    color: COLORS.ink,
+  },
+  hexApply: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    backgroundColor: COLORS.primary,
+    borderRadius: 8,
+  },
+  hexApplyDisabled: {
+    backgroundColor: COLORS.border,
+  },
+  hexApplyText: {
+    fontFamily: FONTS.semibold,
+    fontSize: 13,
+    color: COLORS.white,
   },
 });
